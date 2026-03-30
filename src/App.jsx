@@ -177,9 +177,10 @@ const S = {
     background: "none", border: "none", cursor: "pointer",
     fontSize: 14, marginBottom: 20, padding: 0,
   },
-  posterImg: {
+  posterImg: (height) => ({
     width: "100%", borderRadius: 16, marginBottom: 20,
-    objectFit: "cover", maxHeight: 200, display: "block",
+    objectFit: "contain", display: "block",
+    maxHeight: height || "auto",
   },
   detailHero: (color) => ({
     background: `linear-gradient(135deg, ${color}22, ${color}08)`,
