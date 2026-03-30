@@ -2,57 +2,25 @@ import { useState, useEffect, useRef } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
 // After deploying your Google Apps Script, paste the Web App URL here:
-const APPS_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVBH4DBG40W8V7rnMBgyqvQK5V3HxN-M3t1El9sP7zQIPI8ae-6zLtrkvgEn8vgmYo/exec";
 
 // ─── MOCK EVENTS DATA ───────────────────────────────────────────────────────
 const EVENTS = [
   {
     id: 1,
-    title: "AI & The Future of Education",
-    speaker: "Dr. Sarah Ahmed",
-    speakerTitle: "AI Research Lead, LUMS",
-    date: "April 12, 2025",
-    time: "7:00 PM PKT",
-    duration: "90 mins",
-    seats: 200,
-    filled: 134,
-    fee: 500,
-    tag: "Artificial Intelligence",
+    title: "Docking & ADMET Training Workshop",
+    speaker: "Dr. Hafiz Amir Ali Kharl",
+    speakerTitle: "Lab Manager Narcotics Forensic Lab., Forensic Pharmacist, Scientist",
+    date: "Will be announced soon",
+    time: "TBD",
+    duration: "2 Days",
+    seats: 500,
+    filled: 118,
+    fee: 200,
+    tag: "Molecular Docking, ADMET",
     color: "#4F7CFF",
     description:
-      "An in-depth webinar exploring how AI is reshaping learning, curriculum design, and student engagement across universities in Pakistan and beyond.",
-  },
-  {
-    id: 2,
-    title: "Mental Health in Academic Pressure",
-    speaker: "Usman Tariq",
-    speakerTitle: "Clinical Psychologist, Shaukat Khanum",
-    date: "April 20, 2025",
-    time: "6:30 PM PKT",
-    duration: "60 mins",
-    seats: 150,
-    filled: 89,
-    fee: 0,
-    tag: "Psychology",
-    color: "#22C97A",
-    description:
-      "A candid conversation about stress, burnout, and resilience strategies for students navigating the pressures of modern academic life.",
-  },
-  {
-    id: 3,
-    title: "Entrepreneurship from Zero",
-    speaker: "Zara Khan",
-    speakerTitle: "Founder, TechLaunch PK",
-    date: "May 3, 2025",
-    time: "8:00 PM PKT",
-    duration: "120 mins",
-    seats: 300,
-    filled: 201,
-    fee: 750,
-    tag: "Business",
-    color: "#FF6B35",
-    description:
-      "From idea validation to your first customer — a practical masterclass for students and young professionals ready to build something real.",
+      "An in-depth webinar exploring Molecular Docking & Validation, ADMET & Likeness, Network Pharmacology, Molecular Dynamics Simulation.",
   },
 ];
 
