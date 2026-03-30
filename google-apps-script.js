@@ -1,25 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
-//  TEAM ZARAR — Google Apps Script Backend
-//  Saves registration data to Google Sheets + payment screenshots to Drive
+//  TEAM ZARAR — Google Apps Script Backend (Dynamic Version)
+//  Each event sends its own sheetId + folderId → data goes to correct place
 // ═══════════════════════════════════════════════════════════════════
-//
-//  SETUP STEPS:
-//  1. Go to https://script.google.com → New Project
-//  2. Paste this entire file
-//  3. Replace SHEET_ID and DRIVE_FOLDER_ID below with your values
-//  4. Click Deploy → New Deployment → Web App
-//     - Execute as: Me
-//     - Who has access: Anyone
-//  5. Copy the Web App URL → paste into your app's APPS_SCRIPT_URL
-// ═══════════════════════════════════════════════════════════════════
-
-const SHEET_ID = "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g";
-// How to get: Open your Google Sheet → look at URL:
-// https://docs.google.com/spreadsheets/d/  >>>THIS_PART<<<  /edit
-
-const DRIVE_FOLDER_ID = "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh";
-// How to get: Open your Drive folder → look at URL:
-// https://drive.google.com/drive/folders/  >>>THIS_PART<<<
 
 // ─── HEADERS (auto-created on first run) ────────────────────────────────────
 const HEADERS = [
@@ -39,8 +21,18 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
 
-    // 1. Open sheet
-    const ss = SpreadsheetApp.openById(SHEET_ID);
+    // ✅ Read sheetId and folderId sent dynamically from App.jsx per event
+    const sheetId = data.sheetId;
+    const folderId = data.folderId;
+
+    if (!sheetId || !folderId) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: "error", message: "Missing sheetId or folderId" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 1. Open that event's specific sheet
+    const ss = SpreadsheetApp.openById(sheetId);
     const sheet = ss.getSheetByName("Registrations") || ss.insertSheet("Registrations");
 
     // 2. Add headers if sheet is empty
@@ -50,14 +42,15 @@ function doPost(e) {
       sheet.setFrozenRows(1);
     }
 
-    // 3. Upload screenshot to Drive (if provided)
+    // 3. Upload screenshot to that event's specific Drive folder (if provided)
     let screenshotLink = "No screenshot";
     if (data.screenshotBase64 && data.screenshotName) {
       screenshotLink = uploadScreenshot(
         data.screenshotBase64,
         data.screenshotName,
         data.fullName,
-        data.eventTitle
+        data.eventTitle,
+        folderId
       );
     }
 
@@ -89,9 +82,9 @@ function doPost(e) {
 }
 
 // ─── SCREENSHOT UPLOADER ─────────────────────────────────────────────────────
-function uploadScreenshot(base64Data, fileName, participantName, eventTitle) {
+function uploadScreenshot(base64Data, fileName, participantName, eventTitle, folderId) {
   try {
-    const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+    const folder = DriveApp.getFolderById(folderId);
 
     // Determine MIME type
     const ext = fileName.split(".").pop().toLowerCase();
@@ -116,13 +109,17 @@ function uploadScreenshot(base64Data, fileName, participantName, eventTitle) {
   }
 }
 
-// ─── TEST FUNCTION (run manually to verify setup) ────────────────────────────
+// ─── TEST FUNCTION ────────────────────────────────────────────────────────────
+// Replace these with any one of your event's IDs just to test connection
 function testSetup() {
-  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const testSheetId = "PASTE_ANY_ONE_SHEET_ID_HERE";
+  const testFolderId = "PASTE_ANY_ONE_FOLDER_ID_HERE";
+
+  const ss = SpreadsheetApp.openById(testSheetId);
   Logger.log("✅ Sheet connected: " + ss.getName());
 
-  const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+  const folder = DriveApp.getFolderById(testFolderId);
   Logger.log("✅ Drive folder connected: " + folder.getName());
 
-  Logger.log("✅ Setup looks good! Deploy as Web App now.");
+  Logger.log("✅ Dynamic setup looks good!");
 }
