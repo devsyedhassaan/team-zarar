@@ -14,15 +14,14 @@ const EVENTS = [
     date: "Will be announced soon",
     time: "TBD",
     duration: "2 Days",
-    seats: ,
+    seats: 500,
     filled: 118,
     fee: 200,
     tag: "Molecular Docking, ADMET",
     color: "#4F7CFF",
-    description:
-      "An in-depth webinar exploring Molecular Docking & Validation, ADMET & Likeness, Network Pharmacology, Molecular Dynamics Simulation.",
-    sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",   // ← Google Sheet ID for this event
-    folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh", // ← Drive Folder ID for this event
+    description: "An in-depth webinar exploring Molecular Docking & Validation, ADMET & Likeness, Network Pharmacology, Molecular Dynamics Simulation.",
+    sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
+    folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
   },
 ];
 
