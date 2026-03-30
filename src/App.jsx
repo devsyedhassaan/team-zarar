@@ -1,31 +1,69 @@
 import { useState, useEffect, useRef } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
-// After deploying your Google Apps Script, paste the Web App URL here:
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNG58D2R9Bth28W0TU0BA6_rjpKfeeitvwiEU15QeYxMfQDFR72EzgTRK3Bi5gkKZo/exec";
+const APPS_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
 
-// ─── MOCK EVENTS DATA ───────────────────────────────────────────────────────
+// ─── EVENTS DATA ─────────────────────────────────────────────────────────────
+// HOW TO ADD/EDIT EVENTS:
+// "hostPhoto" → paste a direct image URL for the speaker photo
+// "poster"    → paste a direct image URL for the event poster
+// "fee: 0"    → FREE event (payment screenshot optional)
+// "fee: 500"  → Paid (payment screenshot becomes MANDATORY)
 const EVENTS = [
   {
     id: 1,
-    title: "Docking & ADMET Training Workshop",
-    speaker: "Dr. Hafiz Amir Ali Kharl",
-    speakerTitle: "Lab Manager Narcotics Forensic Lab., Forensic Pharmacist, Scientist",
-    date: "Will be announced soon",
-    time: "TBD",
-    duration: "2 Days",
-    seats: 500,
-    filled: 118,
-    fee: 200,
-    tag: "Molecular Docking, ADMET",
+    title: "AI & The Future of Education",
+    speaker: "Dr. Sarah Ahmed",
+    speakerTitle: "AI Research Lead, LUMS",
+    date: "April 12, 2025",
+    time: "7:00 PM PKT",
+    duration: "90 mins",
+    seats: 200,
+    filled: 134,
+    fee: 500,
+    tag: "Artificial Intelligence",
     color: "#4F7CFF",
-    description: "An in-depth webinar exploring Molecular Docking & Validation, ADMET & Likeness, Network Pharmacology, Molecular Dynamics Simulation.",
-    sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
-    folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
+    description: "An in-depth webinar exploring how AI is reshaping learning, curriculum design, and student engagement across universities in Pakistan and beyond.",
+    hostPhoto: "https://i.pravatar.cc/150?img=47",
+    poster: "https://placehold.co/600x300/0B0E1A/4F7CFF?text=AI+%26+Education",
+  },
+  {
+    id: 2,
+    title: "Mental Health in Academic Pressure",
+    speaker: "Usman Tariq",
+    speakerTitle: "Clinical Psychologist, Shaukat Khanum",
+    date: "April 20, 2025",
+    time: "6:30 PM PKT",
+    duration: "60 mins",
+    seats: 150,
+    filled: 89,
+    fee: 0,
+    tag: "Psychology",
+    color: "#22C97A",
+    description: "A candid conversation about stress, burnout, and resilience strategies for students navigating the pressures of modern academic life.",
+    hostPhoto: "https://i.pravatar.cc/150?img=12",
+    poster: "https://placehold.co/600x300/0B0E1A/22C97A?text=Mental+Health",
+  },
+  {
+    id: 3,
+    title: "Entrepreneurship from Zero",
+    speaker: "Zara Khan",
+    speakerTitle: "Founder, TechLaunch PK",
+    date: "May 3, 2025",
+    time: "8:00 PM PKT",
+    duration: "120 mins",
+    seats: 300,
+    filled: 201,
+    fee: 750,
+    tag: "Business",
+    color: "#FF6B35",
+    description: "From idea validation to your first customer — a practical masterclass for students and young professionals ready to build something real.",
+    hostPhoto: "https://i.pravatar.cc/150?img=32",
+    poster: "https://placehold.co/600x300/0B0E1A/FF6B35?text=Entrepreneurship",
   },
 ];
 
-// ─── UTILITIES ──────────────────────────────────────────────────────────────
+// ─── UTILITIES ───────────────────────────────────────────────────────────────
 function fileToBase64(file) {
   return new Promise((res, rej) => {
     const r = new FileReader();
@@ -35,7 +73,7 @@ function fileToBase64(file) {
   });
 }
 
-// ─── ICONS ──────────────────────────────────────────────────────────────────
+// ─── ICONS ───────────────────────────────────────────────────────────────────
 const Icon = {
   Calendar: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
@@ -79,7 +117,7 @@ const Icon = {
   ),
 };
 
-// ─── STYLES ─────────────────────────────────────────────────────────────────
+// ─── STYLES ──────────────────────────────────────────────────────────────────
 const S = {
   app: {
     minHeight: "100vh",
@@ -90,6 +128,7 @@ const S = {
     margin: "0 auto",
     position: "relative",
     overflowX: "hidden",
+    paddingBottom: 52,
   },
   header: {
     padding: "24px 20px 16px",
@@ -101,380 +140,198 @@ const S = {
     zIndex: 10,
   },
   logo: {
-    fontSize: 22,
-    fontWeight: 800,
-    letterSpacing: "-0.5px",
-    color: "#fff",
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
+    fontSize: 22, fontWeight: 800, letterSpacing: "-0.5px",
+    color: "#fff", display: "flex", alignItems: "center", gap: 10,
   },
-  logoAccent: {
-    color: "#4F7CFF",
+  logoAccent: { color: "#4F7CFF" },
+  logoTag: { fontSize: 11, fontWeight: 500, color: "#888", letterSpacing: "0.5px", marginTop: 2 },
+  devBar: {
+    position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
+    width: "100%", maxWidth: 480,
+    background: "#060912", borderTop: "1px solid #1a2040",
+    padding: "9px 0 8px", textAlign: "center", zIndex: 100,
   },
-  logoTag: {
-    fontSize: 11,
-    fontWeight: 500,
-    color: "#888",
-    letterSpacing: "0.5px",
-    marginTop: 2,
+  devText: {
+    fontFamily: "'Courier New', Courier, monospace",
+    fontSize: 11, color: "#4F7CFF", letterSpacing: "1.5px",
   },
-  page: {
-    padding: "20px",
-    paddingBottom: 40,
-  },
+  page: { padding: "20px", paddingBottom: 40 },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#4F7CFF",
-    letterSpacing: "1.5px",
-    textTransform: "uppercase",
-    marginBottom: 6,
+    fontSize: 13, fontWeight: 600, color: "#4F7CFF",
+    letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 6,
   },
   heroTitle: {
-    fontSize: 26,
-    fontWeight: 800,
-    color: "#fff",
-    lineHeight: 1.2,
-    marginBottom: 20,
-    letterSpacing: "-0.5px",
+    fontSize: 26, fontWeight: 800, color: "#fff",
+    lineHeight: 1.2, marginBottom: 20, letterSpacing: "-0.5px",
   },
   eventCard: (color) => ({
-    background: "rgba(255,255,255,0.04)",
-    border: `1px solid rgba(255,255,255,0.08)`,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-    borderLeft: `3px solid ${color}`,
-    position: "relative",
-    overflow: "hidden",
+    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: 16, marginBottom: 16, cursor: "pointer",
+    transition: "all 0.2s ease", borderLeft: `3px solid ${color}`,
+    position: "relative", overflow: "hidden",
   }),
+  cardBody: { padding: "16px 20px 20px" },
   tag: (color) => ({
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 5,
-    fontSize: 11,
-    fontWeight: 600,
-    color: color,
-    background: `${color}18`,
-    border: `1px solid ${color}30`,
-    borderRadius: 20,
-    padding: "3px 10px",
-    marginBottom: 10,
-    letterSpacing: "0.3px",
+    display: "inline-flex", alignItems: "center", gap: 5,
+    fontSize: 11, fontWeight: 600, color: color,
+    background: `${color}18`, border: `1px solid ${color}30`,
+    borderRadius: 20, padding: "3px 10px", marginBottom: 10, letterSpacing: "0.3px",
   }),
-  eventTitle: {
-    fontSize: 17,
-    fontWeight: 700,
-    color: "#fff",
-    marginBottom: 6,
-    lineHeight: 1.3,
+  eventTitle: { fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 10, lineHeight: 1.3 },
+  speakerRow: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 },
+  speakerAvatar: {
+    width: 40, height: 40, borderRadius: "50%", objectFit: "cover",
+    border: "2px solid rgba(255,255,255,0.1)", flexShrink: 0,
   },
-  speaker: {
-    fontSize: 13,
-    color: "#AAB0C0",
-    marginBottom: 14,
-  },
-  meta: {
-    display: "flex",
-    gap: 16,
-    flexWrap: "wrap",
-    marginBottom: 14,
-  },
-  metaItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: 5,
-    fontSize: 12,
-    color: "#888",
-  },
-  progressBar: (pct, color) => ({
-    height: 3,
-    background: "rgba(255,255,255,0.06)",
-    borderRadius: 99,
-    overflow: "hidden",
-    marginBottom: 10,
-    position: "relative",
+  speakerFallback: (color) => ({
+    width: 40, height: 40, borderRadius: "50%",
+    background: `${color}30`, border: `2px solid ${color}50`,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontSize: 18, flexShrink: 0,
   }),
+  speakerName: { fontSize: 13, color: "#E8EAF0", fontWeight: 600 },
+  speakerSub: { fontSize: 11, color: "#666" },
+  meta: { display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 14 },
+  metaItem: { display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#888" },
+  progressBar: { height: 3, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden", marginBottom: 10 },
   progressFill: (pct, color) => ({
-    height: "100%",
-    width: `${pct}%`,
-    background: color,
-    borderRadius: 99,
-    transition: "width 1s ease",
+    height: "100%", width: `${pct}%`, background: color,
+    borderRadius: 99, transition: "width 1s ease",
   }),
-  feeRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  feeBadge: (free) => ({
-    fontSize: 14,
-    fontWeight: 700,
-    color: free ? "#22C97A" : "#fff",
-  }),
+  feeRow: { display: "flex", justifyContent: "space-between", alignItems: "center" },
+  feeBadge: (free) => ({ fontSize: 14, fontWeight: 700, color: free ? "#22C97A" : "#fff" }),
   registerBtn: (color) => ({
-    fontSize: 12,
-    fontWeight: 700,
-    color: "#fff",
-    background: color,
-    border: "none",
-    borderRadius: 8,
-    padding: "7px 16px",
-    cursor: "pointer",
-    letterSpacing: "0.3px",
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
+    fontSize: 12, fontWeight: 700, color: "#fff", background: color,
+    border: "none", borderRadius: 8, padding: "7px 16px", cursor: "pointer",
+    letterSpacing: "0.3px", display: "flex", alignItems: "center", gap: 6,
   }),
-  // Detail page
   backBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    color: "#888",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    fontSize: 14,
-    marginBottom: 20,
-    padding: 0,
+    display: "flex", alignItems: "center", gap: 8, color: "#888",
+    background: "none", border: "none", cursor: "pointer",
+    fontSize: 14, marginBottom: 20, padding: 0,
+  },
+  posterImg: {
+    width: "100%", borderRadius: 16, marginBottom: 20,
+    objectFit: "cover", maxHeight: 200, display: "block",
   },
   detailHero: (color) => ({
     background: `linear-gradient(135deg, ${color}22, ${color}08)`,
-    border: `1px solid ${color}30`,
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 24,
+    border: `1px solid ${color}30`, borderRadius: 20, padding: 24, marginBottom: 24,
   }),
   detailTag: (color) => ({
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 5,
-    fontSize: 11,
-    fontWeight: 600,
-    color: color,
-    background: `${color}20`,
-    border: `1px solid ${color}40`,
-    borderRadius: 20,
-    padding: "3px 10px",
-    marginBottom: 12,
+    display: "inline-flex", alignItems: "center", gap: 5,
+    fontSize: 11, fontWeight: 600, color: color,
+    background: `${color}20`, border: `1px solid ${color}40`,
+    borderRadius: 20, padding: "3px 10px", marginBottom: 12,
   }),
-  detailTitle: {
-    fontSize: 22,
-    fontWeight: 800,
-    color: "#fff",
-    lineHeight: 1.25,
-    marginBottom: 8,
+  detailTitle: { fontSize: 22, fontWeight: 800, color: "#fff", lineHeight: 1.25, marginBottom: 12 },
+  detailSpeakerRow: { display: "flex", alignItems: "center", gap: 12, marginBottom: 18 },
+  detailAvatar: {
+    width: 54, height: 54, borderRadius: "50%", objectFit: "cover",
+    border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0,
   },
-  detailSpeaker: {
-    fontSize: 14,
-    color: "#AAB0C0",
-    marginBottom: 18,
-  },
-  detailMeta: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 10,
-    marginBottom: 18,
-  },
-  metaBox: {
-    background: "rgba(255,255,255,0.05)",
-    borderRadius: 10,
-    padding: "10px 12px",
-  },
-  metaBoxLabel: {
-    fontSize: 10,
-    color: "#666",
-    letterSpacing: "0.5px",
-    textTransform: "uppercase",
-    marginBottom: 3,
-  },
-  metaBoxValue: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#fff",
-  },
+  detailMeta: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 18 },
+  metaBox: { background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 12px" },
+  metaBoxLabel: { fontSize: 10, color: "#666", letterSpacing: "0.5px", textTransform: "uppercase", marginBottom: 3 },
+  metaBoxValue: { fontSize: 13, fontWeight: 600, color: "#fff" },
   descBox: {
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    fontSize: 14,
-    color: "#AAB0C0",
-    lineHeight: 1.6,
+    background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
+    borderRadius: 12, padding: 16, marginBottom: 24, fontSize: 14, color: "#AAB0C0", lineHeight: 1.6,
   },
   bigRegBtn: (color) => ({
-    width: "100%",
-    padding: "16px",
-    background: color,
-    color: "#fff",
-    fontWeight: 800,
-    fontSize: 16,
-    border: "none",
-    borderRadius: 14,
-    cursor: "pointer",
-    letterSpacing: "0.2px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
+    width: "100%", padding: "16px", background: color, color: "#fff",
+    fontWeight: 800, fontSize: 16, border: "none", borderRadius: 14,
+    cursor: "pointer", letterSpacing: "0.2px",
+    display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
   }),
-  // Form
-  formHeader: {
-    marginBottom: 24,
-  },
-  formTitle: {
-    fontSize: 22,
-    fontWeight: 800,
-    color: "#fff",
-    marginBottom: 6,
-  },
-  formSub: {
-    fontSize: 13,
-    color: "#888",
-  },
-  fieldGroup: {
-    marginBottom: 18,
-  },
-  label: {
-    display: "block",
-    fontSize: 12,
-    fontWeight: 600,
-    color: "#AAB0C0",
-    marginBottom: 7,
-    letterSpacing: "0.3px",
-  },
-  required: {
-    color: "#FF5555",
-    marginLeft: 3,
-  },
+  formHeader: { marginBottom: 24 },
+  formTitle: { fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 6 },
+  formSub: { fontSize: 13, color: "#888" },
+  fieldGroup: { marginBottom: 18 },
+  label: { display: "block", fontSize: 12, fontWeight: 600, color: "#AAB0C0", marginBottom: 7, letterSpacing: "0.3px" },
+  required: { color: "#FF5555", marginLeft: 3 },
   input: {
-    width: "100%",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 10,
-    padding: "13px 14px",
-    color: "#fff",
-    fontSize: 14,
-    outline: "none",
-    boxSizing: "border-box",
-    transition: "border 0.2s",
+    width: "100%", background: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10,
+    padding: "13px 14px", color: "#fff", fontSize: 14,
+    outline: "none", boxSizing: "border-box", transition: "border 0.2s",
   },
-  uploadBox: (hasFile) => ({
-    border: `2px dashed ${hasFile ? "#22C97A" : "rgba(255,255,255,0.15)"}`,
-    borderRadius: 12,
-    padding: "24px 16px",
-    textAlign: "center",
-    cursor: "pointer",
-    background: hasFile ? "rgba(34,201,122,0.05)" : "rgba(255,255,255,0.02)",
-    transition: "all 0.2s",
+  radioGroup: { display: "flex", gap: 12, marginTop: 2 },
+  radioOption: (selected, color) => ({
+    flex: 1, display: "flex", alignItems: "center", gap: 8,
+    padding: "11px 14px", borderRadius: 10,
+    border: `1.5px solid ${selected ? color : "rgba(255,255,255,0.1)"}`,
+    background: selected ? `${color}15` : "rgba(255,255,255,0.03)",
+    cursor: "pointer", transition: "all 0.15s",
   }),
-  uploadText: {
-    fontSize: 13,
-    color: "#888",
-    marginTop: 8,
-  },
+  radioCircle: (selected, color) => ({
+    width: 18, height: 18, borderRadius: "50%",
+    border: `2px solid ${selected ? color : "#555"}`,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    flexShrink: 0, transition: "all 0.15s",
+  }),
+  radioDot: (color) => ({ width: 8, height: 8, borderRadius: "50%", background: color }),
+  radioLabel: (selected) => ({
+    fontSize: 13, fontWeight: selected ? 600 : 400,
+    color: selected ? "#fff" : "#888", transition: "all 0.15s",
+  }),
+  errorText: { fontSize: 11, color: "#FF5555", marginTop: 5 },
   submitBtn: {
-    width: "100%",
-    padding: "16px",
+    width: "100%", padding: "16px",
     background: "linear-gradient(135deg, #4F7CFF, #6B4FFF)",
-    color: "#fff",
-    fontWeight: 800,
-    fontSize: 16,
-    border: "none",
-    borderRadius: 14,
-    cursor: "pointer",
-    marginTop: 8,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
+    color: "#fff", fontWeight: 800, fontSize: 16, border: "none",
+    borderRadius: 14, cursor: "pointer", marginTop: 8,
+    display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
   },
-  errorText: {
-    fontSize: 11,
-    color: "#FF5555",
-    marginTop: 5,
-  },
-  // Thank you
   thankBox: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: "75vh",
-    textAlign: "center",
-    padding: "0 20px",
+    display: "flex", flexDirection: "column", alignItems: "center",
+    justifyContent: "center", minHeight: "75vh", textAlign: "center", padding: "0 20px",
   },
   checkCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: "50%",
-    background: "rgba(34,201,122,0.15)",
-    border: "2px solid #22C97A",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#22C97A",
-    marginBottom: 24,
+    width: 80, height: 80, borderRadius: "50%",
+    background: "rgba(34,201,122,0.15)", border: "2px solid #22C97A",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    color: "#22C97A", marginBottom: 24,
   },
-  thankTitle: {
-    fontSize: 26,
-    fontWeight: 800,
-    color: "#fff",
-    marginBottom: 10,
-    letterSpacing: "-0.5px",
-  },
-  thankSub: {
-    fontSize: 14,
-    color: "#888",
-    lineHeight: 1.6,
-    marginBottom: 32,
-    maxWidth: 300,
-  },
+  thankTitle: { fontSize: 26, fontWeight: 800, color: "#fff", marginBottom: 10, letterSpacing: "-0.5px" },
+  thankSub: { fontSize: 14, color: "#888", lineHeight: 1.6, marginBottom: 32, maxWidth: 300 },
   homeBtn: {
-    padding: "14px 32px",
-    background: "rgba(79,124,255,0.15)",
-    border: "1px solid rgba(79,124,255,0.4)",
-    color: "#4F7CFF",
-    fontWeight: 700,
-    fontSize: 15,
-    borderRadius: 12,
-    cursor: "pointer",
+    padding: "14px 32px", background: "rgba(79,124,255,0.15)",
+    border: "1px solid rgba(79,124,255,0.4)", color: "#4F7CFF",
+    fontWeight: 700, fontSize: 15, borderRadius: 12, cursor: "pointer",
   },
 };
 
-// ─── UPLOAD FIELD COMPONENT ──────────────────────────────────────────────────
-function UploadField({ screenshot, onFile }) {
+// ─── DEV BAR ─────────────────────────────────────────────────────────────────
+function DevBar() {
+  return (
+    <div style={S.devBar}>
+      <span style={S.devText}>
+        <span style={{ color: "#22C97A" }}>&gt;_ </span>
+        <span style={{ color: "#555" }}>developed by </span>
+        dev_syedhassaan
+      </span>
+    </div>
+  );
+}
+
+// ─── UPLOAD FIELD ─────────────────────────────────────────────────────────────
+function UploadField({ screenshot, onFile, required, error }) {
   const inputId = "payment-screenshot-input";
   return (
     <div style={S.fieldGroup}>
       <label style={S.label}>
         Payment Screenshot
-        <span style={{ color: "#666", fontWeight: 400 }}> (JPG / PNG / JPEG)</span>
+        {required ? <span style={S.required}>*</span> : <span style={{ color: "#555", fontWeight: 400 }}> (optional for free events)</span>}
       </label>
-
-      {/* Visible upload button */}
-      <label
-        htmlFor={inputId}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          border: `2px dashed ${screenshot ? "#22C97A" : "rgba(255,255,255,0.2)"}`,
-          borderRadius: 12,
-          padding: "28px 16px",
-          background: screenshot ? "rgba(34,201,122,0.06)" : "rgba(255,255,255,0.02)",
-          cursor: "pointer",
-          textAlign: "center",
-          minHeight: 110,
-        }}
-      >
+      <label htmlFor={inputId} style={{
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", gap: 8,
+        border: `2px dashed ${error ? "#FF5555" : screenshot ? "#22C97A" : "rgba(255,255,255,0.2)"}`,
+        borderRadius: 12, padding: "28px 16px",
+        background: screenshot ? "rgba(34,201,122,0.06)" : "rgba(255,255,255,0.02)",
+        cursor: "pointer", textAlign: "center", minHeight: 110,
+      }}>
         {screenshot ? (
           <>
             <div style={{ fontSize: 28, color: "#22C97A" }}>✓</div>
@@ -483,37 +340,49 @@ function UploadField({ screenshot, onFile }) {
           </>
         ) : (
           <>
-            <div style={{ color: "#666" }}>
-              <Icon.Upload />
-            </div>
+            <div style={{ color: "#666" }}><Icon.Upload /></div>
             <div style={{ fontSize: 14, color: "#aaa", fontWeight: 500 }}>Tap to choose from Gallery</div>
             <div style={{ fontSize: 11, color: "#555" }}>JPG, JPEG, PNG supported</div>
           </>
         )}
       </label>
-
-      {/* Actual file input — linked via htmlFor/id */}
-      <input
-        id={inputId}
-        type="file"
-        accept="image/jpeg,image/jpg,image/png"
+      <input id={inputId} type="file" accept="image/jpeg,image/jpg,image/png"
         style={{ position: "absolute", width: 1, height: 1, opacity: 0, overflow: "hidden" }}
-        onChange={onFile}
-      />
+        onChange={onFile} />
+      {error && <div style={S.errorText}>{error}</div>}
     </div>
   );
 }
 
-// ─── FIELD COMPONENT (must be outside App to prevent focus loss) ─────────────
+// ─── RADIO FIELD ─────────────────────────────────────────────────────────────
+function RadioField({ label, required, options, value, onChange, error, accentColor }) {
+  return (
+    <div style={S.fieldGroup}>
+      <label style={S.label}>{label}{required && <span style={S.required}>*</span>}</label>
+      <div style={S.radioGroup}>
+        {options.map((opt) => {
+          const selected = value === opt;
+          return (
+            <div key={opt} style={S.radioOption(selected, accentColor)} onClick={() => onChange(opt)}>
+              <div style={S.radioCircle(selected, accentColor)}>
+                {selected && <div style={S.radioDot(accentColor)} />}
+              </div>
+              <span style={S.radioLabel(selected)}>{opt}</span>
+            </div>
+          );
+        })}
+      </div>
+      {error && <div style={S.errorText}>{error}</div>}
+    </div>
+  );
+}
+
+// ─── TEXT FIELD ───────────────────────────────────────────────────────────────
 function Field({ id, label, required, type = "text", placeholder, value, onChange, error, accentColor }) {
   return (
     <div style={S.fieldGroup}>
       <label style={S.label}>{label}{required && <span style={S.required}>*</span>}</label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
+      <input type={type} placeholder={placeholder} value={value} onChange={onChange}
         style={{ ...S.input, borderColor: error ? "#FF5555" : "rgba(255,255,255,0.1)" }}
         onFocus={e => e.target.style.borderColor = accentColor || "#4F7CFF"}
         onBlur={e => e.target.style.borderColor = error ? "#FF5555" : "rgba(255,255,255,0.1)"}
@@ -523,12 +392,18 @@ function Field({ id, label, required, type = "text", placeholder, value, onChang
   );
 }
 
-// ─── APP ─────────────────────────────────────────────────────────────────────
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const [screen, setScreen] = useState("home"); // home | detail | form | thanks
+  const [screen, setScreen] = useState("home");
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [filledCounts, setFilledCounts] = useState(
+    Object.fromEntries(EVENTS.map(ev => [ev.id, ev.filled]))
+  );
   const [form, setForm] = useState({
-    fullName: "", phone: "", email: "", institute: "", fieldOfStudy: "", screenshot: null,
+    fullName: "", phone: "", email: "",
+    institute: "", fieldOfStudy: "",
+    semester: "", status: "",
+    screenshot: null,
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -538,13 +413,10 @@ export default function App() {
     if (pageRef.current) pageRef.current.scrollTop = 0;
   }, [screen]);
 
-  function openEvent(ev) {
-    setSelectedEvent(ev);
-    setScreen("detail");
-  }
+  function openEvent(ev) { setSelectedEvent(ev); setScreen("detail"); }
 
   function openForm() {
-    setForm({ fullName: "", phone: "", email: "", institute: "", fieldOfStudy: "", screenshot: null });
+    setForm({ fullName: "", phone: "", email: "", institute: "", fieldOfStudy: "", semester: "", status: "", screenshot: null });
     setErrors({});
     setScreen("form");
   }
@@ -556,6 +428,8 @@ export default function App() {
     else if (!/^[\d\s\+\-]{7,15}$/.test(form.phone.trim())) e.phone = "Enter a valid phone number";
     if (!form.email.trim()) e.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = "Enter a valid email";
+    if (!form.status) e.status = "Please select your status";
+    if (selectedEvent?.fee > 0 && !form.screenshot) e.screenshot = "Payment screenshot is required for paid events";
     return e;
   }
 
@@ -564,32 +438,23 @@ export default function App() {
     if (Object.keys(e).length) { setErrors(e); return; }
     setSubmitting(true);
     try {
-      let screenshotBase64 = null;
-      let screenshotName = null;
+      let screenshotBase64 = null, screenshotName = null;
       if (form.screenshot) {
         screenshotBase64 = await fileToBase64(form.screenshot);
         screenshotName = form.screenshot.name;
       }
       const payload = {
-        eventTitle: selectedEvent.title,
-        eventDate: selectedEvent.date,
-        fullName: form.fullName,
-        phone: form.phone,
-        email: form.email,
-        institute: form.institute,
-        fieldOfStudy: form.fieldOfStudy,
-        screenshotBase64,
-        screenshotName,
+        eventTitle: selectedEvent.title, eventDate: selectedEvent.date,
+        fullName: form.fullName, phone: form.phone, email: form.email,
+        institute: form.institute, fieldOfStudy: form.fieldOfStudy,
+        semester: form.semester, status: form.status,
+        screenshotBase64, screenshotName,
         timestamp: new Date().toISOString(),
-        sheetId: selectedEvent.sheetId,   // ✅ sends this event's Sheet ID
-        folderId: selectedEvent.folderId, // ✅ sends this event's Folder ID
       };
       if (APPS_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
-        await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
       }
+      setFilledCounts(prev => ({ ...prev, [selectedEvent.id]: (prev[selectedEvent.id] || 0) + 1 }));
       setScreen("thanks");
     } catch (err) {
       console.error(err);
@@ -602,57 +467,64 @@ export default function App() {
   function handleFile(e) {
     const file = e.target.files[0];
     if (!file) return;
-    const allowed = ["image/jpeg", "image/jpg", "image/png"];
-    if (!allowed.includes(file.type)) { alert("Only JPG, JPEG, PNG allowed"); return; }
-    setForm((f) => ({ ...f, screenshot: file }));
+    if (!["image/jpeg","image/jpg","image/png"].includes(file.type)) { alert("Only JPG, JPEG, PNG allowed"); return; }
+    setForm(f => ({ ...f, screenshot: file }));
+    setErrors(er => ({ ...er, screenshot: undefined }));
   }
 
-  // ── HOME ────────────────────────────────────────────────────────────────
+  // ── HOME ──────────────────────────────────────────────────────────────────
   if (screen === "home") return (
     <div style={S.app} ref={pageRef}>
       <div style={S.header}>
-        <div style={S.logo}>
-          <span>Team<span style={S.logoAccent}> Zarar</span></span>
-        </div>
+        <div style={S.logo}><span>Team<span style={S.logoAccent}> Zarar</span></span></div>
         <div style={S.logoTag}>Expert Talks & Webinars</div>
       </div>
       <div style={S.page}>
         <div style={S.sectionTitle}>Upcoming Webinars</div>
         <div style={S.heroTitle}>Learn from the<br />Best Minds</div>
         {EVENTS.map((ev) => {
-          const pct = Math.round((ev.filled / ev.seats) * 100);
+          const filled = filledCounts[ev.id] ?? ev.filled;
+          const pct = Math.min(100, Math.round((filled / ev.seats) * 100));
           return (
             <div key={ev.id} style={S.eventCard(ev.color)} onClick={() => openEvent(ev)}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}>
-              <div style={S.tag(ev.color)}><Icon.Tag />{ev.tag}</div>
-              <div style={S.eventTitle}>{ev.title}</div>
-              <div style={S.speaker}>{ev.speaker} · {ev.speakerTitle}</div>
-              <div style={S.meta}>
-                <div style={S.metaItem}><Icon.Calendar />{ev.date}</div>
-                <div style={S.metaItem}><Icon.Clock />{ev.time}</div>
-                <div style={S.metaItem}><Icon.Users />{ev.filled}/{ev.seats} registered</div>
-              </div>
-              <div style={S.progressBar(pct, ev.color)}>
-                <div style={S.progressFill(pct, ev.color)} />
-              </div>
-              <div style={S.feeRow}>
-                <div style={S.feeBadge(ev.fee === 0)}>
-                  {ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}
+              <div style={S.cardBody}>
+                <div style={S.tag(ev.color)}><Icon.Tag />{ev.tag}</div>
+                <div style={S.eventTitle}>{ev.title}</div>
+                <div style={S.speakerRow}>
+                  {ev.hostPhoto
+                    ? <img src={ev.hostPhoto} alt={ev.speaker} style={S.speakerAvatar} onError={e => e.target.style.display="none"} />
+                    : <div style={S.speakerFallback(ev.color)}>🎤</div>}
+                  <div>
+                    <div style={S.speakerName}>{ev.speaker}</div>
+                    <div style={S.speakerSub}>{ev.speakerTitle}</div>
+                  </div>
                 </div>
-                <button style={S.registerBtn(ev.color)}>Register <Icon.Arrow /></button>
+                <div style={S.meta}>
+                  <div style={S.metaItem}><Icon.Calendar />{ev.date}</div>
+                  <div style={S.metaItem}><Icon.Clock />{ev.time}</div>
+                  <div style={S.metaItem}><Icon.Users />{filled}/{ev.seats}</div>
+                </div>
+                <div style={S.progressBar}><div style={S.progressFill(pct, ev.color)} /></div>
+                <div style={S.feeRow}>
+                  <div style={S.feeBadge(ev.fee === 0)}>{ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}</div>
+                  <button style={S.registerBtn(ev.color)}>Register <Icon.Arrow /></button>
+                </div>
               </div>
             </div>
           );
         })}
       </div>
+      <DevBar />
     </div>
   );
 
-  // ── DETAIL ──────────────────────────────────────────────────────────────
+  // ── DETAIL ────────────────────────────────────────────────────────────────
   if (screen === "detail" && selectedEvent) {
     const ev = selectedEvent;
-    const pct = Math.round((ev.filled / ev.seats) * 100);
+    const filled = filledCounts[ev.id] ?? ev.filled;
+    const pct = Math.min(100, Math.round((filled / ev.seats) * 100));
     return (
       <div style={S.app} ref={pageRef}>
         <div style={S.header}>
@@ -660,42 +532,42 @@ export default function App() {
         </div>
         <div style={S.page}>
           <button style={S.backBtn} onClick={() => setScreen("home")}><Icon.Back /> Back to Events</button>
+          {ev.poster && <img src={ev.poster} alt="Event Poster" style={S.posterImg} onError={e => e.target.style.display="none"} />}
           <div style={S.detailHero(ev.color)}>
             <div style={S.detailTag(ev.color)}><Icon.Tag />{ev.tag}</div>
             <div style={S.detailTitle}>{ev.title}</div>
-            <div style={S.detailSpeaker}>🎤 {ev.speaker} — {ev.speakerTitle}</div>
+            <div style={S.detailSpeakerRow}>
+              {ev.hostPhoto
+                ? <img src={ev.hostPhoto} alt={ev.speaker} style={S.detailAvatar} onError={e => e.target.style.display="none"} />
+                : <div style={{ ...S.speakerFallback(ev.color), width: 54, height: 54, fontSize: 22 }}>🎤</div>}
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{ev.speaker}</div>
+                <div style={{ fontSize: 12, color: "#AAB0C0" }}>{ev.speakerTitle}</div>
+              </div>
+            </div>
             <div style={S.detailMeta}>
               <div style={S.metaBox}><div style={S.metaBoxLabel}>Date</div><div style={S.metaBoxValue}>{ev.date}</div></div>
               <div style={S.metaBox}><div style={S.metaBoxLabel}>Time</div><div style={S.metaBoxValue}>{ev.time}</div></div>
               <div style={S.metaBox}><div style={S.metaBoxLabel}>Duration</div><div style={S.metaBoxValue}>{ev.duration}</div></div>
               <div style={S.metaBox}><div style={S.metaBoxLabel}>Fee</div><div style={S.metaBoxValue}>{ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}</div></div>
             </div>
-            <div style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>{pct}% seats filled ({ev.filled}/{ev.seats})</div>
-            <div style={S.progressBar(pct, ev.color)}><div style={S.progressFill(pct, ev.color)} /></div>
+            <div style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>{pct}% seats filled ({filled}/{ev.seats})</div>
+            <div style={S.progressBar}><div style={S.progressFill(pct, ev.color)} /></div>
           </div>
           <div style={S.descBox}>{ev.description}</div>
-          <button style={S.bigRegBtn(ev.color)} onClick={openForm}>
-            Register for this Event <Icon.Arrow />
-          </button>
+          <button style={S.bigRegBtn(ev.color)} onClick={openForm}>Register for this Event <Icon.Arrow /></button>
         </div>
+        <DevBar />
       </div>
     );
   }
 
-  // ── FORM ────────────────────────────────────────────────────────────────
+  // ── FORM ──────────────────────────────────────────────────────────────────
   if (screen === "form" && selectedEvent) {
     const ev = selectedEvent;
     const mkField = (id, label, required, type, placeholder) => (
-      <Field
-        key={id}
-        id={id}
-        label={label}
-        required={required}
-        type={type}
-        placeholder={placeholder}
-        value={form[id]}
-        accentColor={ev.color}
-        error={errors[id]}
+      <Field key={id} id={id} label={label} required={required} type={type}
+        placeholder={placeholder} value={form[id]} accentColor={ev.color} error={errors[id]}
         onChange={e => { setForm(f => ({ ...f, [id]: e.target.value })); setErrors(er => ({ ...er, [id]: undefined })); }}
       />
     );
@@ -711,15 +583,19 @@ export default function App() {
             <div style={S.formTitle}>{ev.title}</div>
             <div style={S.formSub}>{ev.date} · {ev.time}</div>
           </div>
-
-          {mkField("fullName", "Full Name", true, "text", "e.g. Hassaan Zarar")}
-          {mkField("phone", "Contact Number", true, "tel", "e.g. +92 300 1234567")}
-          {mkField("email", "Email Address", true, "email", "e.g. you@example.com")}
-          {mkField("institute", "University / Institute", false, "text", "e.g. University of Lahore")}
-          {mkField("fieldOfStudy", "Field of Study", false, "text", "e.g. Computer Science")}
-
-          <UploadField screenshot={form.screenshot} onFile={handleFile} />
-
+          {mkField("fullName",     "Full Name",              true,  "text",  "e.g. Hassaan Zarar")}
+          {mkField("phone",        "Contact Number",         true,  "tel",   "e.g. +92 300 1234567")}
+          {mkField("email",        "Email Address",          true,  "email", "e.g. you@example.com")}
+          {mkField("institute",    "University / Institute", false, "text",  "e.g. University of Lahore")}
+          {mkField("fieldOfStudy", "Field of Study",         false, "text",  "e.g. Computer Science")}
+          {mkField("semester",     "Semester / Year",        false, "text",  "e.g. 3rd Semester / 2nd Year")}
+          <RadioField
+            label="Status" required
+            options={["Undergraduate", "Graduated"]}
+            value={form.status} accentColor={ev.color} error={errors.status}
+            onChange={val => { setForm(f => ({ ...f, status: val })); setErrors(er => ({ ...er, status: undefined })); }}
+          />
+          <UploadField screenshot={form.screenshot} onFile={handleFile} required={ev.fee > 0} error={errors.screenshot} />
           <button style={{ ...S.submitBtn, opacity: submitting ? 0.7 : 1 }} onClick={handleSubmit} disabled={submitting}>
             {submitting ? "Submitting..." : "Submit Registration"} {!submitting && <Icon.Arrow />}
           </button>
@@ -727,11 +603,12 @@ export default function App() {
             Fields marked <span style={{ color: "#FF5555" }}>*</span> are required
           </div>
         </div>
+        <DevBar />
       </div>
     );
   }
 
-  // ── THANK YOU ───────────────────────────────────────────────────────────
+  // ── THANK YOU ─────────────────────────────────────────────────────────────
   if (screen === "thanks") return (
     <div style={S.app} ref={pageRef}>
       <div style={S.thankBox}>
@@ -740,10 +617,9 @@ export default function App() {
         <div style={S.thankSub}>
           Thank you for registering for <strong style={{ color: "#fff" }}>{selectedEvent?.title}</strong>. We'll send the webinar link to your email before the event.
         </div>
-        <button style={S.homeBtn} onClick={() => { setScreen("home"); setSelectedEvent(null); }}>
-          Back to Events
-        </button>
+        <button style={S.homeBtn} onClick={() => { setScreen("home"); setSelectedEvent(null); }}>Back to Events</button>
       </div>
+      <DevBar />
     </div>
   );
 
