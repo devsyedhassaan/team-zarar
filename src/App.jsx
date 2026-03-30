@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
 // After deploying your Google Apps Script, paste the Web App URL here:
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVBH4DBG40W8V7rnMBgyqvQK5V3HxN-M3t1El9sP7zQIPI8ae-6zLtrkvgEn8vgmYo/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDADiIH3gAdURzmYklPVBhoSaLyYeCPA7qDTk9Crk3vd2b0kNgZhNFRB3up-eRMSXi/exec";
 
 // ─── MOCK EVENTS DATA ───────────────────────────────────────────────────────
 const EVENTS = [
