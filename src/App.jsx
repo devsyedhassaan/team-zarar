@@ -419,6 +419,8 @@ export default function App() {
         semester: form.semester, status: form.status,
         screenshotBase64, screenshotName,
         timestamp: new Date().toISOString(),
+        sheetId: selectedEvent.sheetId,    // ✅ added
+        folderId: selectedEvent.folderId,  // ✅ added
       };
       if (APPS_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
         await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
