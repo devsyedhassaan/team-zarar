@@ -21,6 +21,8 @@ const EVENTS = [
     color: "#4F7CFF",
     description:
       "An in-depth webinar exploring Molecular Docking & Validation, ADMET & Likeness, Network Pharmacology, Molecular Dynamics Simulation.",
+    sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",   // ← Google Sheet ID for this event
+    folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh", // ← Drive Folder ID for this event
   },
 ];
 
@@ -580,6 +582,8 @@ export default function App() {
         screenshotBase64,
         screenshotName,
         timestamp: new Date().toISOString(),
+        sheetId: selectedEvent.sheetId,   // ✅ sends this event's Sheet ID
+        folderId: selectedEvent.folderId, // ✅ sends this event's Folder ID
       };
       if (APPS_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
         await fetch(APPS_SCRIPT_URL, {
