@@ -578,6 +578,7 @@ export default function App() {
         email: form.email,
         institute: form.institute,
         fieldOfStudy: form.fieldOfStudy,
+        YearofStudy: form.YearofStudy,
         screenshotBase64,
         screenshotName,
         timestamp: new Date().toISOString(),
