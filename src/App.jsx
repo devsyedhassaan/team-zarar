@@ -181,6 +181,7 @@ const S = {
     width: "100%", borderRadius: 16, marginBottom: 20,
     objectFit: "contain", display: "block",
     maxHeight: height || "auto",
+  }),
   },
   detailHero: (color) => ({
     background: `linear-gradient(135deg, ${color}22, ${color}08)`,
