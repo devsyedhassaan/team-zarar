@@ -368,6 +368,23 @@ export default function App() {
   const [filledCounts, setFilledCounts] = useState(
     Object.fromEntries(EVENTS.map(ev => [ev.id, ev.filled]))
   );
+  useEffect(() => {
+    async function fetchCounts() {
+      const results = await Promise.all(
+        EVENTS.map(async (ev) => {
+          try {
+            const res = await fetch(`${APPS_SCRIPT_URL}?sheetId=${ev.sheetId}`);
+            const data = await res.json();
+            return [ev.id, data.count];
+          } catch {
+            return [ev.id, ev.filled];
+          }
+        })
+      );
+      setFilledCounts(Object.fromEntries(results));
+    }
+    fetchCounts();
+  }, []);
   const [form, setForm] = useState({
     fullName: "", phone: "", email: "",
     institute: "", fieldOfStudy: "",
