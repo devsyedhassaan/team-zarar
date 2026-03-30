@@ -14,7 +14,7 @@ const EVENTS = [
     date: "Will be announced soon",
     time: "TBD",
     duration: "2 Days",
-    seats: 500,
+    seats: ,
     filled: 118,
     fee: 200,
     tag: "Molecular Docking, ADMET",
