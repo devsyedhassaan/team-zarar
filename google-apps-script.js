@@ -1,6 +1,3 @@
-const SHEET_ID = "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g";
-const DRIVE_FOLDER_ID = "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh";
-
 const HEADERS = [
   "Timestamp",
   "Event Title",
@@ -18,17 +15,31 @@ const HEADERS = [
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.openById(SHEET_ID);
+
+    // ✅ Reads IDs dynamically from each event in App.jsx
+    const sheetId = data.sheetId;
+    const folderId = data.folderId;
+
+    if (!sheetId || !folderId) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: "error", message: "Missing sheetId or folderId" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    const ss = SpreadsheetApp.openById(sheetId);
     const sheet = ss.getSheetByName("Registrations") || ss.insertSheet("Registrations");
+
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(HEADERS);
       sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight("bold");
       sheet.setFrozenRows(1);
     }
+
     let screenshotLink = "No screenshot";
     if (data.screenshotBase64 && data.screenshotName) {
-      screenshotLink = uploadScreenshot(data.screenshotBase64, data.screenshotName, data.fullName, data.eventTitle);
+      screenshotLink = uploadScreenshot(data.screenshotBase64, data.screenshotName, data.fullName, data.eventTitle, folderId);
     }
+
     sheet.appendRow([
       data.timestamp || new Date().toISOString(),
       data.eventTitle || "",
@@ -42,16 +53,23 @@ function doPost(e) {
       data.status || "",
       screenshotLink,
     ]);
+
     sheet.autoResizeColumns(1, HEADERS.length);
-    return ContentService.createTextOutput(JSON.stringify({ status: "success" })).setMimeType(ContentService.MimeType.JSON);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "success" }))
+      .setMimeType(ContentService.MimeType.JSON);
+
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-function uploadScreenshot(base64Data, fileName, participantName, eventTitle) {
+function uploadScreenshot(base64Data, fileName, participantName, eventTitle, folderId) {
   try {
-    const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+    const folder = DriveApp.getFolderById(folderId);
     const ext = fileName.split(".").pop().toLowerCase();
     const mimeMap = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png" };
     const mimeType = mimeMap[ext] || "image/jpeg";
@@ -67,9 +85,5 @@ function uploadScreenshot(base64Data, fileName, participantName, eventTitle) {
 }
 
 function testSetup() {
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  Logger.log("Sheet connected: " + ss.getName());
-  const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-  Logger.log("Drive folder connected: " + folder.getName());
-  Logger.log("Setup is working! Deploy as Web App now.");
+  Logger.log("✅ Dynamic script ready! No fixed IDs needed.");
 }
