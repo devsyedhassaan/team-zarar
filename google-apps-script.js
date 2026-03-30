@@ -13,11 +13,11 @@
 //  5. Copy the Web App URL → paste into your app's APPS_SCRIPT_URL
 // ═══════════════════════════════════════════════════════════════════
 
-const SHEET_ID = "YOUR_GOOGLE_SHEET_ID_HERE";
+const SHEET_ID = "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g";
 // How to get: Open your Google Sheet → look at URL:
 // https://docs.google.com/spreadsheets/d/  >>>THIS_PART<<<  /edit
 
-const DRIVE_FOLDER_ID = "YOUR_DRIVE_FOLDER_ID_HERE";
+const DRIVE_FOLDER_ID = "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh";
 // How to get: Open your Drive folder → look at URL:
 // https://drive.google.com/drive/folders/  >>>THIS_PART<<<
 
