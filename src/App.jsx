@@ -24,24 +24,6 @@ const EVENTS = [
     sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",   // ← Google Sheet ID for this event
     folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh", // ← Drive Folder ID for this event
   },
-  {
-    id: 2,
-    title: "Interview",
-    speaker: "Dr. Hassaan",
-    speakerTitle: "Pharmacistt",
-    date: "Will be announced soon",
-    time: "TBD",
-    duration: "2 Days",
-    seats: 2000,
-    filled: 118,
-    fee: 5000,
-    tag: "PHARMD",
-    color: "#4F7CFF",
-    description:
-      "An in-depth webinar exploring Molecular Docking & Validation, ADMET & Likeness, Network Pharmacology, Molecular Dynamics Simulation.",
-    sheetId: "1nHU4u7zukhBOg7FvSFUYeG_PF4PDSxRclV5uw-khsgk",   // ← Google Sheet ID for this event
-    folderId: "1GJv77PXwSUsjyhU_SqofD74CTmz-gCqE", // ← Drive Folder ID for this event
-  },
 ];
 
 // ─── UTILITIES ──────────────────────────────────────────────────────────────
