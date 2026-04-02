@@ -49,8 +49,8 @@ const EVENTS = [
     hostPhoto: "/speaker.jpg",
     poster: "/poster1.jpeg",
     posterHeight: 700,
-    sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
-    folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
+    sheetId: "",
+    folderId: "",
   },
 ];
 
