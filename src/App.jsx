@@ -9,6 +9,8 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhUKSlmTpRW9n
 // "poster"    → paste a direct image URL for the event poster
 // "fee: 0"    → FREE event (payment screenshot optional)
 // "fee: 500"  → Paid (payment screenshot becomes MANDATORY)
+// "date"      → use "YYYY-MM-DD" format e.g. "2025-06-15" for automatic upcoming/past sorting
+//               use "TBD" if date is not yet decided (will appear in upcoming)
 const EVENTS = [
   {
     id: 1,
@@ -40,6 +42,18 @@ function fileToBase64(file) {
     r.onerror = () => rej(new Error("File read failed"));
     r.readAsDataURL(file);
   });
+}
+
+// Returns true if the event date has already passed today
+// date format expected: "YYYY-MM-DD" e.g. "2025-04-10"
+// Events with date "TBD" or unparseable are treated as upcoming
+function isPast(dateStr) {
+  if (!dateStr || dateStr === "TBD") return false;
+  const eventDate = new Date(dateStr);
+  if (isNaN(eventDate.getTime())) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return eventDate < today;
 }
 
 // ─── ICONS ───────────────────────────────────────────────────────────────────
@@ -461,52 +475,73 @@ export default function App() {
   }
 
   // ── HOME ──────────────────────────────────────────────────────────────────
-  if (screen === "home") return (
-    <div style={S.app} ref={pageRef}>
-      <div style={S.header}>
-        <div style={S.logo}><span>Team<span style={S.logoAccent}> Zarar</span></span></div>
-        <div style={S.logoTag}>Expert Talks & Webinars</div>
-      </div>
-      <div style={S.page}>
-        <div style={S.sectionTitle}>Upcoming Webinars</div>
-        <div style={S.heroTitle}>Learn from the<br />Best Minds</div>
-        {EVENTS.map((ev) => {
-          const filled = filledCounts[ev.id] ?? ev.filled;
-          const pct = Math.min(100, Math.round((filled / ev.seats) * 100));
-          return (
-            <div key={ev.id} style={S.eventCard(ev.color)} onClick={() => openEvent(ev)}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}>
-              <div style={S.cardBody}>
-                <div style={S.tag(ev.color)}><Icon.Tag />{ev.tag}</div>
-                <div style={S.eventTitle}>{ev.title}</div>
-                <div style={S.speakerRow}>
-                  {ev.hostPhoto
-                    ? <img src={ev.hostPhoto} alt={ev.speaker} style={S.speakerAvatar} onError={e => e.target.style.display="none"} />
-                    : <div style={S.speakerFallback(ev.color)}>🎤</div>}
-                  <div>
-                    <div style={S.speakerName}>{ev.speaker}</div>
-                    <div style={S.speakerSub}>{ev.speakerTitle}</div>
-                  </div>
-                </div>
-                <div style={S.meta}>
-                  <div style={S.metaItem}><Icon.Calendar />{ev.date}</div>
-                  <div style={S.metaItem}><Icon.Clock />{ev.time}</div>
-                  <div style={S.metaItem}><Icon.Users />{filled}/{ev.seats}</div>
-                </div>
-                <div style={S.progressBar}><div style={S.progressFill(pct, ev.color)} /></div>
-                <div style={S.feeRow}>
-                  <div style={S.feeBadge(ev.fee === 0)}>{ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}</div>
-                  <button style={S.registerBtn(ev.color)}>Register <Icon.Arrow /></button>
-                </div>
+  if (screen === "home") {
+    const upcomingEvents = EVENTS.filter(ev => !isPast(ev.date));
+    const pastEvents = EVENTS.filter(ev => isPast(ev.date));
+
+    const renderCard = (ev, past) => {
+      const filled = filledCounts[ev.id] ?? ev.filled;
+      const pct = Math.min(100, Math.round((filled / ev.seats) * 100));
+      const cardStyle = past
+        ? { ...S.eventCard(ev.color), opacity: 0.6, filter: "grayscale(40%)" }
+        : S.eventCard(ev.color);
+      return (
+        <div key={ev.id} style={cardStyle} onClick={() => openEvent(ev)}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
+          onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}>
+          <div style={S.cardBody}>
+            <div style={S.tag(ev.color)}><Icon.Tag />{ev.tag}</div>
+            <div style={S.eventTitle}>{ev.title}</div>
+            <div style={S.speakerRow}>
+              {ev.hostPhoto
+                ? <img src={ev.hostPhoto} alt={ev.speaker} style={S.speakerAvatar} onError={e => e.target.style.display="none"} />
+                : <div style={S.speakerFallback(ev.color)}>🎤</div>}
+              <div>
+                <div style={S.speakerName}>{ev.speaker}</div>
+                <div style={S.speakerSub}>{ev.speakerTitle}</div>
               </div>
             </div>
-          );
-        })}
+            <div style={S.meta}>
+              <div style={S.metaItem}><Icon.Calendar />{ev.date}</div>
+              <div style={S.metaItem}><Icon.Clock />{ev.time}</div>
+              <div style={S.metaItem}><Icon.Users />{filled}/{ev.seats}</div>
+            </div>
+            <div style={S.progressBar}><div style={S.progressFill(pct, ev.color)} /></div>
+            <div style={S.feeRow}>
+              <div style={S.feeBadge(ev.fee === 0)}>{ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}</div>
+              {!past && <button style={S.registerBtn(ev.color)}>Register <Icon.Arrow /></button>}
+              {past && <span style={{ fontSize: 11, fontWeight: 600, color: "#555", background: "rgba(255,255,255,0.05)", borderRadius: 6, padding: "5px 10px" }}>Event Ended</span>}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div style={S.app} ref={pageRef}>
+        <div style={S.header}>
+          <div style={S.logo}><span>Team<span style={S.logoAccent}> Zarar</span></span></div>
+          <div style={S.logoTag}>Expert Talks & Webinars</div>
+        </div>
+        <div style={S.page}>
+          <div style={S.sectionTitle}>Upcoming Webinars</div>
+          <div style={S.heroTitle}>Learn from the<br />Best Minds</div>
+          {upcomingEvents.length > 0
+            ? upcomingEvents.map(ev => renderCard(ev, false))
+            : <div style={{ fontSize: 13, color: "#555", marginBottom: 24 }}>No upcoming events at the moment. Check back soon!</div>
+          }
+          {pastEvents.length > 0 && (
+            <>
+              <div style={{ ...S.sectionTitle, marginTop: 28, color: "#666" }}>Past Events</div>
+              <div style={{ fontSize: 13, color: "#555", marginBottom: 16 }}>These events have already taken place.</div>
+              {pastEvents.map(ev => renderCard(ev, true))}
+            </>
+          )}
+        </div>
+        <DevBar />
       </div>
-      <DevBar />
-    </div>
-  );
+    );
+  }
 
   // ── DETAIL ────────────────────────────────────────────────────────────────
   if (screen === "detail" && selectedEvent) {
@@ -543,7 +578,14 @@ export default function App() {
             <div style={S.progressBar}><div style={S.progressFill(pct, ev.color)} /></div>
           </div>
           <div style={S.descBox}>{ev.description}</div>
-          <button style={S.bigRegBtn(ev.color)} onClick={openForm}>Register for this Event <Icon.Arrow /></button>
+          {!isPast(ev.date) && (
+            <button style={S.bigRegBtn(ev.color)} onClick={openForm}>Register for this Event <Icon.Arrow /></button>
+          )}
+          {isPast(ev.date) && (
+            <div style={{ textAlign: "center", padding: "16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, fontSize: 14, color: "#555", fontWeight: 600 }}>
+              This event has already taken place
+            </div>
+          )}
         </div>
         <DevBar />
       </div>
