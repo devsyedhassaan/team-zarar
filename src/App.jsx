@@ -40,8 +40,6 @@ const EVENTS = [
     date: "2026-03-29",
     time: "08:30 PM",
     duration: "3 Hours",
-    seats: 100,
-    filled: 100,
     fee: 0,
     tag: "Research, Scientific Writing",
     color: "#4F7CFF",
