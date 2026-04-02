@@ -583,7 +583,39 @@ export default function App() {
             value={form.status} accentColor={ev.color} error={errors.status}
             onChange={val => { setForm(f => ({ ...f, status: val })); setErrors(er => ({ ...er, status: undefined })); }}
           />
-          <UploadField screenshot={form.screenshot} onFile={handleFile} required={ev.fee > 0} error={errors.screenshot} />
+          {ev.fee > 0 && (
+            <div style={{
+              background: "rgba(79,124,255,0.08)",
+              border: "1px solid rgba(79,124,255,0.25)",
+              borderRadius: 12,
+              padding: "16px 18px",
+              marginBottom: 18,
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 12 }}>
+                Make a payment of Rs. {ev.fee} to the following account
+              </div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: "#4F7CFF", letterSpacing: "0.5px", textTransform: "uppercase", marginBottom: 8 }}>
+                Bank Account Details
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 12, color: "#888" }}>Account Number</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#fff", letterSpacing: "0.5px" }}>03108753027</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 12, color: "#888" }}>Payment Method</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#22C97A" }}>JazzCash</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 12, color: "#888" }}>Account Name</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Marsad Zaman Khan</span>
+                </div>
+              </div>
+            </div>
+          )}
+          {ev.fee > 0 && (
+            <UploadField screenshot={form.screenshot} onFile={handleFile} required={true} error={errors.screenshot} />
+          )}
           <button style={{ ...S.submitBtn, opacity: submitting ? 0.7 : 1 }} onClick={handleSubmit} disabled={submitting}>
             {submitting ? "Submitting..." : "Submit Registration"} {!submitting && <Icon.Arrow />}
           </button>
