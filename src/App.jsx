@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx43JOz4VZFPQZURPgltng8cRupK1TIJ7dCf0lHZheHahIKVXHTduWhX349BwfMijBA/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhUKSlmTpRW9nGmUaFvHw4uYKerOChCKl6Cmvpvbkv82MRoPJsFuG9E-shqllfmjM/exec";
 
 // ─── EVENTS DATA ─────────────────────────────────────────────────────────────
 // HOW TO ADD/EDIT EVENTS:
@@ -17,28 +17,8 @@ const EVENTS = [
     title: "Docking & ADMET Training Workshop",
     speaker: "Dr. Hafiz Aamir Ali Kharl",
     speakerTitle: "Lab Manager Narcotics Forensic Lab. , Forensic Pharmacist",
-    date: "2026-04-22",
-    time: "08:00 PM",
-    duration: "2 Days",
-    seats: 100,
-    filled: 0,
-    fee: 200,
-    tag: "Molecular Docking, ADMET, Network Pharmacology",
-    color: "#4F7CFF",
-    description: "An in-depth webinar exploring ADMET & Drug Likeness, Molecular Docking & Validation, Network Pharmacology, Molecular Dynamics Simulation.",
-    hostPhoto: "/speaker.jpg",
-    poster: "/poster.jpg",
-    posterHeight: 400,
-    sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
-    folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
-  },
-   {
-    id: 2,
-    title: "Docking & ADMET Training Workshop",
-    speaker: "Dr. Hafiz Aamir Ali Kharl",
-    speakerTitle: "Lab Manager Narcotics Forensic Lab. , Forensic Pharmacist",
-    date: "2026-03-26",
-    time: "08:00 PM",
+    date: "TBD",
+    time: "TBD",
     duration: "2 Days",
     seats: 100,
     filled: 0,
@@ -502,15 +482,16 @@ export default function App() {
     const renderCard = (ev, past) => {
       const filled = filledCounts[ev.id] ?? ev.filled;
       const pct = Math.min(100, Math.round((filled / ev.seats) * 100));
+      const pastColor = past ? ev.color + "99" : ev.color;
       const cardStyle = past
-        ? { ...S.eventCard(ev.color), opacity: 0.6, filter: "grayscale(40%)" }
+        ? { ...S.eventCard(ev.color), borderLeft: `3px solid ${pastColor}` }
         : S.eventCard(ev.color);
       return (
         <div key={ev.id} style={cardStyle} onClick={() => openEvent(ev)}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
           onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}>
           <div style={S.cardBody}>
-            <div style={S.tag(ev.color)}><Icon.Tag />{ev.tag}</div>
+            <div style={S.tag(past ? pastColor : ev.color)}><Icon.Tag />{ev.tag}</div>
             <div style={S.eventTitle}>{ev.title}</div>
             <div style={S.speakerRow}>
               {ev.hostPhoto
@@ -530,7 +511,7 @@ export default function App() {
             <div style={S.feeRow}>
               <div style={S.feeBadge(ev.fee === 0)}>{ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}</div>
               {!past && <button style={S.registerBtn(ev.color)}>Register <Icon.Arrow /></button>}
-              {past && <span style={{ fontSize: 11, fontWeight: 600, color: "#555", background: "rgba(255,255,255,0.05)", borderRadius: 6, padding: "5px 10px" }}>Event Ended</span>}
+              {past && <span style={{ fontSize: 11, fontWeight: 600, color: "#fff", background: "rgba(0,0,0,0.8)", borderRadius: 6, padding: "5px 10px" }}>Event Ended</span>}
             </div>
           </div>
         </div>
