@@ -47,8 +47,8 @@ const EVENTS = [
     hostPhoto: "/speaker.jpg",
     poster: "/poster1.jpeg",
     posterHeight: 700,
-    sheetId: "",
-    folderId: "",
+    sheetId: "sheet id",
+    folderId: "sheet id",
   },
 ];
 
