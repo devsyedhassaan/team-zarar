@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhUKSlmTpRW9nGmUaFvHw4uYKerOChCKl6Cmvpvbkv82MRoPJsFuG9E-shqllfmjM/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx43JOz4VZFPQZURPgltng8cRupK1TIJ7dCf0lHZheHahIKVXHTduWhX349BwfMijBA/exec";
 
 // ─── EVENTS DATA ─────────────────────────────────────────────────────────────
 // HOW TO ADD/EDIT EVENTS:
