@@ -32,6 +32,26 @@ const EVENTS = [
     sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
     folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
   },
+  {
+    id: 2,
+    title: "Docking & ADMET Training Workshop",
+    speaker: "Dr. Hafiz Aamir Ali Kharl",
+    speakerTitle: "Lab Manager Narcotics Forensic Lab. , Forensic Pharmacist",
+    date: "2026-04-04",
+    time: "08:00 PM",
+    duration: "2 Days",
+    seats: 100,
+    filled: 0,
+    fee: 0,
+    tag: "Molecular Docking, ADMET, Network Pharmacology",
+    color: "#4F7CFF",
+    description: "An in-depth webinar exploring ADMET & Drug Likeness, Molecular Docking & Validation, Network Pharmacology, Molecular Dynamics Simulation.",
+    hostPhoto: "/speaker.jpg",
+    poster: "/poster.jpg",
+    posterHeight: 400,
+    sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
+    folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
+  },
 ];
 
 // ─── UTILITIES ───────────────────────────────────────────────────────────────
