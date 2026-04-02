@@ -551,7 +551,7 @@ export default function App() {
           }
           {pastEvents.length > 0 && (
             <>
-              <div style={{ ...S.sectionTitle, marginTop: 28, color: "#666" }}>Past Events</div>
+              <div style={{ ...S.sectionTitle, marginTop: 28, color: "#4F7CFF" }}>Past Events</div>
               <div style={{ fontSize: 13, color: "#fff", fontWeight: 700, marginBottom: 16 }}>These events have already taken place.</div>
               {pastEvents.map(ev => renderCard(ev, true))}
             </>
