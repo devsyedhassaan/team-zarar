@@ -62,7 +62,7 @@ const EVENTS = [
     tag: "Foreign Scholarship",
     color: "#4F7CFF",
     description: "An in-depth webinar exploring Foreign Scholarships, Study opportunities worldwide, Bestway Scholarship , UK",
-    hostPhoto: "speaker3",
+    hostPhoto: "speaker3.jpeg",
     poster: "",
     posterHeight: 700,
     sheetId: "sheet id",
