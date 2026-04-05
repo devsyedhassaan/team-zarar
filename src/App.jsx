@@ -50,6 +50,24 @@ const EVENTS = [
     sheetId: "sheet id",
     folderId: "sheet id",
   },
+  {
+    id: 3,
+    title: "Roadmap to Foreign Scholarship - Bestway Scholar",
+    speaker: "Dr. Maria Shafaqat",
+    speakerTitle: "Bestway Scholar, University of Kent, UK",
+    date: "2026-02-02",
+    time: "05:00 PM",
+    duration: "3 Hours",
+    fee: 0,
+    tag: "Foreign Scholarship",
+    color: "#4F7CFF",
+    description: "An in-depth webinar exploring Foreign Scholarships, Study opportunities worldwide, Bestway Scholarship , UK",
+    hostPhoto: "/speaker.jpg",
+    poster: "",
+    posterHeight: 700,
+    sheetId: "sheet id",
+    folderId: "sheet id",
+  },
 ];
 
 // ─── UTILITIES ───────────────────────────────────────────────────────────────
