@@ -650,7 +650,7 @@ export default function App() {
             <div style={S.formTitle}>{ev.title}</div>
             <div style={S.formSub}>{ev.date} · {ev.time}</div>
           </div>
-          {mkField("fullName",     "Full Name",              true,  "text",  "e.g. Hassaan Zarar")}
+          {mkField("fullName",     "Full Name",              true,  "text",  "e.g. Mr. ABC")}
           {mkField("phone",        "Contact Number",         true,  "tel",   "e.g. +92 300 1234567")}
           {mkField("email",        "Email Address",          true,  "email", "e.g. you@example.com")}
           {mkField("institute",    "University / Institute", false, "text",  "e.g. University of Lahore")}
