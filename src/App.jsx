@@ -22,7 +22,7 @@ const EVENTS = [
     duration: "2 Days",
     seats: 100,
     filled: 0,
-    fee: 200,
+    fee: 250,
     tag: "Molecular Docking, ADMET, Network Pharmacology",
     color: "#4F7CFF",
     description: "An in-depth webinar exploring ADMET & Drug Likeness, Molecular Docking & Validation, Network Pharmacology, Molecular Dynamics Simulation.",
