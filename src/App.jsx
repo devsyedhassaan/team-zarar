@@ -20,7 +20,7 @@ const EVENTS = [
     date: "2026-04-24 - 2026-04-25",
     time: "08:00 - 10:00 PM",
     duration: "2 Days",
-    seats: 100,
+    seats: 50,
     filled: 0,
     fee: 250,
     tag: "Molecular Docking, ADMET, Network Pharmacology",
