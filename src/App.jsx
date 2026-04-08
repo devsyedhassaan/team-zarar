@@ -21,7 +21,7 @@ const EVENTS = [
     time: "08:00 - 10:00 PM",
     duration: "2 Days",
     seats: 50,
-    filled: 0,
+    filled: 7,
     fee: 250,
     tag: "Molecular Docking, ADMET, Network Pharmacology",
     color: "#4F7CFF",
@@ -418,6 +418,7 @@ export default function App() {
   const [filledCounts, setFilledCounts] = useState(
     Object.fromEntries(EVENTS.map(ev => [ev.id, ev.filled]))
   );
+  const [countsLoaded, setCountsLoaded] = useState(false);
   useEffect(() => {
     async function fetchCounts() {
       const results = await Promise.all(
@@ -432,6 +433,7 @@ export default function App() {
         })
       );
       setFilledCounts(Object.fromEntries(results));
+      setCountsLoaded(true);
     }
     fetchCounts();
   }, []);
