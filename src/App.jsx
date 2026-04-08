@@ -27,7 +27,7 @@ const EVENTS = [
     color: "#4F7CFF",
     description: "An in-depth webinar exploring ADMET & Drug Likeness, Molecular Docking & Validation, Network Pharmacology, Molecular Dynamics Simulation.",
     hostPhoto: "/speaker.jpg",
-    poster: "/poster.jpg",
+    poster: "/dock.jpeg",
     posterHeight: 400,
     sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
     folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
