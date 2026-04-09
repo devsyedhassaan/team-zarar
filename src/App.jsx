@@ -4,6 +4,13 @@ import { useState, useEffect, useRef } from "react";
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhUKSlmTpRW9nGmUaFvHw4uYKerOChCKl6Cmvpvbkv82MRoPJsFuG9E-shqllfmjM/exec";
 
 // ─── EVENTS DATA ─────────────────────────────────────────────────────────────
+// HOW TO ADD/EDIT EVENTS:
+// "hostPhoto" → paste a direct image URL for the speaker photo
+// "poster"    → paste a direct image URL for the event poster
+// "fee: 0"    → FREE event (payment screenshot optional)
+// "fee: 500"  → Paid (payment screenshot becomes MANDATORY)
+// "date"      → use "YYYY-MM-DD" format e.g. "2025-06-15" for automatic upcoming/past sorting
+//               use "TBD" if date is not yet decided (will appear in upcoming)
 const EVENTS = [
   {
     id: 1,
@@ -14,7 +21,7 @@ const EVENTS = [
     time: "08:00 - 10:00 PM",
     duration: "2 Days",
     seats: 50,
-    filled: 7,
+    filled: 15,
     fee: 250,
     tag: "Molecular Docking, ADMET, Network Pharmacology",
     color: "#4F7CFF",
@@ -73,23 +80,16 @@ function fileToBase64(file) {
   });
 }
 
+// Returns true if the event date has already passed today
+// date format expected: "YYYY-MM-DD" e.g. "2025-04-10"
+// Events with date "TBD" or unparseable are treated as upcoming
 function isPast(dateStr) {
   if (!dateStr || dateStr === "TBD") return false;
-  // Handle date ranges like "2026-04-24 - 2026-04-25" — use the END date
-  const parts = dateStr.split(" - ");
-  const checkDate = parts.length > 1 ? parts[1].trim() : dateStr.trim();
-  const eventDate = new Date(checkDate);
+  const eventDate = new Date(dateStr);
   if (isNaN(eventDate.getTime())) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return eventDate < today;
-}
-
-// ─── HISTORY HELPERS ─────────────────────────────────────────────────────────
-// We push a state entry for every "screen forward" navigation.
-// The popstate listener will call goBack() when the user taps the device back button.
-function pushScreen(screenName, eventId = null) {
-  window.history.pushState({ screen: screenName, eventId }, "");
 }
 
 // ─── ICONS ───────────────────────────────────────────────────────────────────
@@ -418,9 +418,6 @@ export default function App() {
   const [filledCounts, setFilledCounts] = useState(
     Object.fromEntries(EVENTS.map(ev => [ev.id, ev.filled]))
   );
-  const [countsLoaded, setCountsLoaded] = useState(false);
-
-  // ── Fetch seat counts ───────────────────────────────────────────────────
   useEffect(() => {
     async function fetchCounts() {
       const results = await Promise.all(
@@ -435,48 +432,9 @@ export default function App() {
         })
       );
       setFilledCounts(Object.fromEntries(results));
-      setCountsLoaded(true);
     }
     fetchCounts();
   }, []);
-
-  // ── Seed initial history entry so popstate fires on first back press ────
-  useEffect(() => {
-    // Replace the very first entry so it carries state
-    window.history.replaceState({ screen: "home", eventId: null }, "");
-  }, []);
-
-  // ── Handle browser / Android hardware back button ───────────────────────
-  useEffect(() => {
-    function handlePopState(e) {
-      const state = e.state;
-      if (!state) {
-        // No more history inside the app — let it close naturally
-        return;
-      }
-      const targetScreen = state.screen;
-      const targetEventId = state.eventId;
-
-      if (targetScreen === "home") {
-        setScreen("home");
-        setSelectedEvent(null);
-      } else if (targetScreen === "detail") {
-        const ev = EVENTS.find(e => e.id === targetEventId);
-        if (ev) setSelectedEvent(ev);
-        setScreen("detail");
-      } else if (targetScreen === "form") {
-        setScreen("form");
-        // selectedEvent stays as-is
-      } else {
-        setScreen("home");
-        setSelectedEvent(null);
-      }
-    }
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
-
   const [form, setForm] = useState({
     fullName: "", phone: "", email: "",
     institute: "", fieldOfStudy: "",
@@ -485,36 +443,20 @@ export default function App() {
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const pageRef = useRef();
 
-  // ── Scroll to top on every screen change ───────────────────────────────
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    if (pageRef.current) pageRef.current.scrollTop = 0;
   }, [screen]);
 
-  // ── Navigation helpers (push history + set state) ───────────────────────
-  function openEvent(ev) {
-    setSelectedEvent(ev);
-    pushScreen("detail", ev.id);
-    setScreen("detail");
-  }
+  function openEvent(ev) { setSelectedEvent(ev); setScreen("detail"); }
 
   function openForm() {
     setForm({ fullName: "", phone: "", email: "", institute: "", fieldOfStudy: "", semester: "", status: "", screenshot: null });
     setErrors({});
-    pushScreen("form", selectedEvent?.id ?? null);
     setScreen("form");
   }
 
-  function goBackToHome() {
-    // Push home so the next back press closes the app naturally
-    window.history.back();
-  }
-
-  function goBackToDetail() {
-    window.history.back();
-  }
-
-  // ── Validation ──────────────────────────────────────────────────────────
   function validate() {
     const e = {};
     if (!form.fullName.trim()) e.fullName = "Full name is required";
@@ -544,15 +486,13 @@ export default function App() {
         semester: form.semester, status: form.status,
         screenshotBase64, screenshotName,
         timestamp: new Date().toISOString(),
-        sheetId: selectedEvent.sheetId,
-        folderId: selectedEvent.folderId,
+        sheetId: selectedEvent.sheetId,    // ✅ added
+        folderId: selectedEvent.folderId,  // ✅ added
       };
       if (APPS_SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
         await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
       }
       setFilledCounts(prev => ({ ...prev, [selectedEvent.id]: (prev[selectedEvent.id] || 0) + 1 }));
-      // Replace history so back from thanks goes home, not back into form
-      window.history.replaceState({ screen: "home", eventId: null }, "");
       setScreen("thanks");
     } catch (err) {
       console.error(err);
@@ -615,7 +555,7 @@ export default function App() {
     };
 
     return (
-      <div style={S.app}>
+      <div style={S.app} ref={pageRef}>
         <div style={S.header}>
           <div style={S.logo}><span>Team<span style={S.logoAccent}> Zarar</span></span></div>
           <div style={S.logoTag}>Expert Talks & Webinars</div>
@@ -646,12 +586,12 @@ export default function App() {
     const filled = filledCounts[ev.id] ?? ev.filled;
     const pct = Math.min(100, Math.round((filled / ev.seats) * 100));
     return (
-      <div style={S.app}>
+      <div style={S.app} ref={pageRef}>
         <div style={S.header}>
           <div style={S.logo}>Team<span style={S.logoAccent}> Zarar</span></div>
         </div>
         <div style={S.page}>
-          <button style={S.backBtn} onClick={goBackToHome}><Icon.Back /> Back to Events</button>
+          <button style={S.backBtn} onClick={() => setScreen("home")}><Icon.Back /> Back to Events</button>
           {ev.poster && <img src={ev.poster} alt="Event Poster" style={S.posterImg} onError={e => e.target.style.display="none"} />}
           <div style={S.detailHero(ev.color)}>
             <div style={S.detailTag(ev.color)}><Icon.Tag />{ev.tag}</div>
@@ -699,12 +639,12 @@ export default function App() {
       />
     );
     return (
-      <div style={S.app}>
+      <div style={S.app} ref={pageRef}>
         <div style={S.header}>
           <div style={S.logo}>Team<span style={S.logoAccent}> Zarar</span></div>
         </div>
         <div style={S.page}>
-          <button style={S.backBtn} onClick={goBackToDetail}><Icon.Back /> Back</button>
+          <button style={S.backBtn} onClick={() => setScreen("detail")}><Icon.Back /> Back</button>
           <div style={S.formHeader}>
             <div style={S.sectionTitle}>Registration Form</div>
             <div style={S.formTitle}>{ev.title}</div>
@@ -769,18 +709,14 @@ export default function App() {
 
   // ── THANK YOU ─────────────────────────────────────────────────────────────
   if (screen === "thanks") return (
-    <div style={S.app}>
+    <div style={S.app} ref={pageRef}>
       <div style={S.thankBox}>
         <div style={S.checkCircle}><Icon.Check /></div>
         <div style={S.thankTitle}>You're Registered!</div>
         <div style={S.thankSub}>
           Thank you for registering for <strong style={{ color: "#fff" }}>{selectedEvent?.title}</strong>. We'll send the webinar link to your email before the event.
         </div>
-        <button style={S.homeBtn} onClick={() => {
-          window.history.replaceState({ screen: "home", eventId: null }, "");
-          setScreen("home");
-          setSelectedEvent(null);
-        }}>Back to Events</button>
+        <button style={S.homeBtn} onClick={() => { setScreen("home"); setSelectedEvent(null); }}>Back to Events</button>
       </div>
       <DevBar />
     </div>
