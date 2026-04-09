@@ -14,7 +14,7 @@ const EVENTS = [
     time: "08:00 - 10:00 PM",
     duration: "2 Days",
     seats: 50,
-    filled: 7,
+    filled: 15,
     fee: 250,
     tag: "Molecular Docking, ADMET, Network Pharmacology",
     color: "#4F7CFF",
