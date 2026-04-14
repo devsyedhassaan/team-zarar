@@ -14,7 +14,7 @@ const EVENTS = [
     time: "08:00 - 10:00 PM",
     duration: "2 Days",
     seats: 50,
-    filled: 23,
+    filled: 25,
     fee: 250,
     tag: "Molecular Docking, ADMET, Network Pharmacology",
     color: "#4F7CFF",
@@ -739,11 +739,11 @@ export default function App() {
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontSize: 12, color: "#888" }}>Account Number</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "#fff", letterSpacing: "0.5px" }}>1644060541015222</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#fff", letterSpacing: "0.5px" }}>03108753027</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontSize: 12, color: "#888" }}>Payment Method</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "#22C97A" }}>MCB Bank</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#22C97A" }}>EasyPaisa</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontSize: 12, color: "#888" }}>Account Name</span>
