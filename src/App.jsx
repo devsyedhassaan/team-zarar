@@ -45,7 +45,7 @@ const EVENTS = [
     posterHeight: 700,
     sheetId: "sheet id",
     folderId: "sheet id",
-    registrationStatus: "open",
+    registrationStatus: "closed",
   },
   {
     id: 3,
@@ -64,7 +64,7 @@ const EVENTS = [
     posterHeight: 700,
     sheetId: "sheet id",
     folderId: "sheet id",
-    registrationStatus: "open",
+    registrationStatus: "closed",
   },
 ];
 
