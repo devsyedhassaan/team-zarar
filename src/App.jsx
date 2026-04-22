@@ -328,7 +328,7 @@ function DevBar() {
       <span style={S.devText}>
         <strong style={{ color: "#22C97A" }}>&gt;_ </strong>
         <strong style={{ color: "#FFFFFF" }}>developed by </strong>
-        <strong style={{ color: "#22C97A" }}>dev_Syed_Hassaan </strong>
+        <strong style={{ color: "#22C97A" }}>Team_Zarar </strong>
       </span>
     </div>
   );
