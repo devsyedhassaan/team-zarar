@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhUKSlmTpRW9nGmUaFvHw4uYKerOChCKl6Cmvpvbkv82MRoPJsFuG9E-shqllfmjM/exec";
 
 // ─── EVENTS DATA ─────────────────────────────────────────────────────────────
+// registrationStatus: "open" | "closed"
+// Set to "closed" to disable registration buttons and hide the registration form.
 const EVENTS = [
   {
     id: 1,
@@ -24,6 +26,7 @@ const EVENTS = [
     posterHeight: 400,
     sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
     folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
+    registrationStatus: "open", // ← change to "open" to re-enable registration
   },
   {
     id: 2,
@@ -42,6 +45,7 @@ const EVENTS = [
     posterHeight: 700,
     sheetId: "sheet id",
     folderId: "sheet id",
+    registrationStatus: "open",
   },
   {
     id: 3,
@@ -60,6 +64,7 @@ const EVENTS = [
     posterHeight: 700,
     sheetId: "sheet id",
     folderId: "sheet id",
+    registrationStatus: "open",
   },
 ];
 
@@ -75,7 +80,6 @@ function fileToBase64(file) {
 
 function isPast(dateStr) {
   if (!dateStr || dateStr === "TBD") return false;
-  // Handle date ranges like "2026-04-24 - 2026-04-25" — use the END date
   const parts = dateStr.split(" - ");
   const checkDate = parts.length > 1 ? parts[1].trim() : dateStr.trim();
   const eventDate = new Date(checkDate);
@@ -85,9 +89,13 @@ function isPast(dateStr) {
   return eventDate < today;
 }
 
+// Returns true if registration should be blocked (either manually closed OR event is past)
+function isRegistrationClosed(ev) {
+  if (isPast(ev.date)) return true;
+  return ev.registrationStatus === "closed";
+}
+
 // ─── HISTORY HELPERS ─────────────────────────────────────────────────────────
-// We push a state entry for every "screen forward" navigation.
-// The popstate listener will call goBack() when the user taps the device back button.
 function pushScreen(screenName, eventId = null) {
   window.history.pushState({ screen: screenName, eventId }, "");
 }
@@ -132,6 +140,16 @@ const Icon = {
   Tag: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
       <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" />
+    </svg>
+  ),
+  Lock: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  ),
+  Flag: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="13" height="13">
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
     </svg>
   ),
 };
@@ -224,6 +242,23 @@ const S = {
     border: "none", borderRadius: 8, padding: "7px 16px", cursor: "pointer",
     letterSpacing: "0.3px", display: "flex", alignItems: "center", gap: 6,
   }),
+  // Badge shown on card when event is past (Event Ended)
+  eventEndedBadge: {
+    fontSize: 11, fontWeight: 700, color: "#FF4D6D",
+    background: "linear-gradient(135deg, rgba(255,77,109,0.18), rgba(180,30,60,0.12))",
+    border: "1px solid rgba(255,77,109,0.35)",
+    borderRadius: 6, padding: "5px 10px",
+    display: "flex", alignItems: "center", gap: 5,
+    boxShadow: "0 0 8px rgba(255,77,109,0.15)",
+    letterSpacing: "0.2px",
+  },
+  // Badge shown on card when registration is manually closed (but event not past)
+  regClosedBadge: {
+    fontSize: 11, fontWeight: 700, color: "#FF8C42",
+    background: "rgba(255,140,66,0.12)", border: "1px solid rgba(255,140,66,0.3)",
+    borderRadius: 6, padding: "5px 10px",
+    display: "flex", alignItems: "center", gap: 5,
+  },
   backBtn: {
     display: "flex", alignItems: "center", gap: 8, color: "#888",
     background: "none", border: "none", cursor: "pointer",
@@ -253,6 +288,20 @@ const S = {
   metaBox: { background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 12px" },
   metaBoxLabel: { fontSize: 10, color: "#666", letterSpacing: "0.5px", textTransform: "uppercase", marginBottom: 3 },
   metaBoxValue: { fontSize: 13, fontWeight: 600, color: "#fff" },
+  // Registration status pill shown on the detail hero card
+  regStatusPill: (closed) => ({
+    display: "inline-flex", alignItems: "center", gap: 6,
+    fontSize: 12, fontWeight: 700,
+    color: closed ? "#FF8C42" : "#22C97A",
+    background: closed ? "rgba(255,140,66,0.1)" : "rgba(34,201,122,0.1)",
+    border: `1px solid ${closed ? "rgba(255,140,66,0.35)" : "rgba(34,201,122,0.35)"}`,
+    borderRadius: 20, padding: "5px 13px", marginBottom: 16,
+  }),
+  regStatusDot: (closed) => ({
+    width: 7, height: 7, borderRadius: "50%",
+    background: closed ? "#FF8C42" : "#22C97A",
+    boxShadow: closed ? "0 0 6px #FF8C42" : "0 0 6px #22C97A",
+  }),
   descBox: {
     background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
     borderRadius: 12, padding: 16, marginBottom: 24, fontSize: 14, color: "#AAB0C0", lineHeight: 1.6,
@@ -263,6 +312,15 @@ const S = {
     cursor: "pointer", letterSpacing: "0.2px",
     display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
   }),
+  // Shown in detail view when registration is manually closed
+  regClosedBox: {
+    textAlign: "center", padding: "18px 16px",
+    background: "rgba(255,140,66,0.07)",
+    border: "1px solid rgba(255,140,66,0.25)",
+    borderRadius: 14, fontSize: 14,
+    color: "#FF8C42", fontWeight: 600,
+    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+  },
   formHeader: { marginBottom: 24 },
   formTitle: { fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 6 },
   formSub: { fontSize: 13, color: "#888" },
@@ -442,7 +500,6 @@ export default function App() {
 
   // ── Seed initial history entry so popstate fires on first back press ────
   useEffect(() => {
-    // Replace the very first entry so it carries state
     window.history.replaceState({ screen: "home", eventId: null }, "");
   }, []);
 
@@ -450,10 +507,7 @@ export default function App() {
   useEffect(() => {
     function handlePopState(e) {
       const state = e.state;
-      if (!state) {
-        // No more history inside the app — let it close naturally
-        return;
-      }
+      if (!state) return;
       const targetScreen = state.screen;
       const targetEventId = state.eventId;
 
@@ -466,7 +520,6 @@ export default function App() {
         setScreen("detail");
       } else if (targetScreen === "form") {
         setScreen("form");
-        // selectedEvent stays as-is
       } else {
         setScreen("home");
         setSelectedEvent(null);
@@ -491,7 +544,7 @@ export default function App() {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [screen]);
 
-  // ── Navigation helpers (push history + set state) ───────────────────────
+  // ── Navigation helpers ──────────────────────────────────────────────────
   function openEvent(ev) {
     setSelectedEvent(ev);
     pushScreen("detail", ev.id);
@@ -506,7 +559,6 @@ export default function App() {
   }
 
   function goBackToHome() {
-    // Push home so the next back press closes the app naturally
     window.history.back();
   }
 
@@ -528,6 +580,9 @@ export default function App() {
   }
 
   async function handleSubmit() {
+    // Guard: block submission if registration is closed
+    if (selectedEvent && isRegistrationClosed(selectedEvent)) return;
+
     const e = validate();
     if (Object.keys(e).length) { setErrors(e); return; }
     setSubmitting(true);
@@ -551,7 +606,6 @@ export default function App() {
         await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
       }
       setFilledCounts(prev => ({ ...prev, [selectedEvent.id]: (prev[selectedEvent.id] || 0) + 1 }));
-      // Replace history so back from thanks goes home, not back into form
       window.history.replaceState({ screen: "home", eventId: null }, "");
       setScreen("thanks");
     } catch (err) {
@@ -578,10 +632,12 @@ export default function App() {
     const renderCard = (ev, past) => {
       const filled = filledCounts[ev.id] ?? ev.filled;
       const pct = Math.min(100, Math.round((filled / ev.seats) * 100));
-      const pastColor = past ? ev.color + "99" : ev.color;
-      const cardStyle = past
+      const regClosed = isRegistrationClosed(ev);
+      const pastColor = (past || regClosed) ? ev.color + "99" : ev.color;
+      const cardStyle = (past || regClosed)
         ? { ...S.eventCard(ev.color), borderLeft: `3px solid ${pastColor}` }
         : S.eventCard(ev.color);
+
       return (
         <div key={ev.id} style={cardStyle} onClick={() => openEvent(ev)}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
@@ -606,8 +662,21 @@ export default function App() {
             <div style={S.progressBar}><div style={S.progressFill(pct, ev.color)} /></div>
             <div style={S.feeRow}>
               <div style={S.feeBadge(ev.fee === 0)}>{ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}</div>
-              {!past && <button style={S.registerBtn(ev.color)}>Register <Icon.Arrow /></button>}
-              {past && <span style={{ fontSize: 11, fontWeight: 600, color: "#fff", background: "rgba(0,0,0,0.8)", borderRadius: 6, padding: "5px 10px" }}>Event Ended</span>}
+
+              {/* ── Registration status badges ── */}
+              {past && (
+                <span style={S.eventEndedBadge}>
+                  <Icon.Flag /> Event Ended
+                </span>
+              )}
+              {!past && regClosed && (
+                <span style={S.regClosedBadge}>
+                  <Icon.Lock /> Registration Ended
+                </span>
+              )}
+              {!past && !regClosed && (
+                <button style={S.registerBtn(ev.color)}>Register <Icon.Arrow /></button>
+              )}
             </div>
           </div>
         </div>
@@ -645,6 +714,9 @@ export default function App() {
     const ev = selectedEvent;
     const filled = filledCounts[ev.id] ?? ev.filled;
     const pct = Math.min(100, Math.round((filled / ev.seats) * 100));
+    const regClosed = isRegistrationClosed(ev);
+    const manualClosed = !isPast(ev.date) && ev.registrationStatus === "closed";
+
     return (
       <div style={S.app}>
         <div style={S.header}>
@@ -671,16 +743,40 @@ export default function App() {
               <div style={S.metaBox}><div style={S.metaBoxLabel}>Duration</div><div style={S.metaBoxValue}>{ev.duration}</div></div>
               <div style={S.metaBox}><div style={S.metaBoxLabel}>Fee</div><div style={S.metaBoxValue}>{ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}</div></div>
             </div>
+
+            {/* ── Registration status pill ── */}
+            <div style={S.regStatusPill(regClosed)}>
+              <div style={S.regStatusDot(regClosed)} />
+              Registration: {regClosed ? "Closed" : "Open"}
+            </div>
+
             <div style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>{pct}% seats filled ({filled}/{ev.seats})</div>
             <div style={S.progressBar}><div style={S.progressFill(pct, ev.color)} /></div>
           </div>
           <div style={S.descBox}>{ev.description}</div>
-          {!isPast(ev.date) && (
-            <button style={S.bigRegBtn(ev.color)} onClick={openForm}>Register for this Event <Icon.Arrow /></button>
+
+          {/* ── CTA area based on status ── */}
+          {!isPast(ev.date) && !regClosed && (
+            <button style={S.bigRegBtn(ev.color)} onClick={openForm}>
+              Register for this Event <Icon.Arrow />
+            </button>
           )}
           {isPast(ev.date) && (
-            <div style={{ textAlign: "center", padding: "16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, fontSize: 14, color: "#555", fontWeight: 600 }}>
-              This event has already taken place
+            <div style={{
+              textAlign: "center", padding: "18px 16px",
+              background: "linear-gradient(135deg, rgba(255,77,109,0.1), rgba(180,30,60,0.07))",
+              border: "1px solid rgba(255,77,109,0.3)",
+              borderRadius: 14, fontSize: 14,
+              color: "#FF4D6D", fontWeight: 700,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              boxShadow: "0 0 16px rgba(255,77,109,0.08)",
+            }}>
+              <Icon.Flag /> This event has already taken place
+            </div>
+          )}
+          {manualClosed && (
+            <div style={S.regClosedBox}>
+              <Icon.Lock /> Registration for this event has ended
             </div>
           )}
         </div>
@@ -690,8 +786,34 @@ export default function App() {
   }
 
   // ── FORM ──────────────────────────────────────────────────────────────────
+  // Safety guard: if somehow a user reaches the form with registration closed, block them
   if (screen === "form" && selectedEvent) {
     const ev = selectedEvent;
+
+    if (isRegistrationClosed(ev)) {
+      return (
+        <div style={S.app}>
+          <div style={S.header}>
+            <div style={S.logo}>Team<span style={S.logoAccent}> Zarar</span></div>
+          </div>
+          <div style={S.page}>
+            <button style={S.backBtn} onClick={goBackToDetail}><Icon.Back /> Back</button>
+            <div style={{ ...S.thankBox, minHeight: "60vh" }}>
+              <div style={{ ...S.checkCircle, background: "rgba(255,140,66,0.12)", border: "2px solid #FF8C42", color: "#FF8C42" }}>
+                <Icon.Lock />
+              </div>
+              <div style={S.thankTitle}>Registration Closed</div>
+              <div style={S.thankSub}>
+                Registration for <strong style={{ color: "#fff" }}>{ev.title}</strong> is no longer available.
+              </div>
+              <button style={S.homeBtn} onClick={goBackToDetail}>Go Back</button>
+            </div>
+          </div>
+          <DevBar />
+        </div>
+      );
+    }
+
     const mkField = (id, label, required, type, placeholder) => (
       <Field key={id} id={id} label={label} required={required} type={type}
         placeholder={placeholder} value={form[id]} accentColor={ev.color} error={errors[id]}
