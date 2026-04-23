@@ -13,7 +13,7 @@ const EVENTS = [
     speaker: "Dr. Hafiz Aamir Ali Kharl",
     speakerTitle: "Lab Manager Narcotics Forensic Lab. , Forensic Pharmacist",
     date: "2026-04-24 - 2026-04-25",
-    time: "08:00 - 10:00 PM",
+    time: "07:00 - 09:00 PM",
     duration: "2 Days",
     seats: 50,
     filled: 30,
