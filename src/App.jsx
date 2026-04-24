@@ -6,6 +6,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhUKSlmTpRW9n
 // ─── EVENTS DATA ─────────────────────────────────────────────────────────────
 // registrationStatus: "open" | "closed"
 // Set to "closed" to disable registration buttons and hide the registration form.
+// closeAt: ISO 8601 datetime string — registration auto-closes at this moment (optional).
 const EVENTS = [
   {
     id: 1,
@@ -26,7 +27,8 @@ const EVENTS = [
     posterHeight: 400,
     sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
     folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
-    registrationStatus: "open", // ← change to "open" to re-enable registration
+    registrationStatus: "open",
+    closeAt: "2026-04-24T15:00:00+05:00", // Auto-close at 3:00 PM PKT (GMT+5) on April 24, 2026
   },
   {
     id: 2,
@@ -89,10 +91,18 @@ function isPast(dateStr) {
   return eventDate < today;
 }
 
-// Returns true if registration should be blocked (either manually closed OR event is past)
+// Returns true if registration should be blocked:
+// - event is past, OR
+// - registrationStatus is manually "closed", OR
+// - closeAt datetime has been reached
 function isRegistrationClosed(ev) {
   if (isPast(ev.date)) return true;
-  return ev.registrationStatus === "closed";
+  if (ev.registrationStatus === "closed") return true;
+  if (ev.closeAt) {
+    const closeTime = new Date(ev.closeAt);
+    if (new Date() >= closeTime) return true;
+  }
+  return false;
 }
 
 // ─── HISTORY HELPERS ─────────────────────────────────────────────────────────
@@ -715,7 +725,7 @@ export default function App() {
     const filled = filledCounts[ev.id] ?? ev.filled;
     const pct = Math.min(100, Math.round((filled / ev.seats) * 100));
     const regClosed = isRegistrationClosed(ev);
-    const manualClosed = !isPast(ev.date) && ev.registrationStatus === "closed";
+    const manualClosed = !isPast(ev.date) && (ev.registrationStatus === "closed" || (ev.closeAt && new Date() >= new Date(ev.closeAt)));
 
     return (
       <div style={S.app}>
