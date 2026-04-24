@@ -17,7 +17,7 @@ const EVENTS = [
     time: "07:00 - 09:00 PM",
     duration: "2 Days",
     seats: 50,
-    filled: 40,
+    filled: 38,
     fee: 250,
     tag: "Molecular Docking, ADMET, Network Pharmacology",
     color: "#4F7CFF",
@@ -27,7 +27,7 @@ const EVENTS = [
     posterHeight: 400,
     sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
     folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
-    registrationStatus: "open",
+    registrationStatus: "closed",
     closeAt: "2026-04-24T15:00:00+05:00", // Auto-close at 3:00 PM PKT (GMT+5) on April 24, 2026
   },
   {
