@@ -20,7 +20,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhUKSlmTpRW9n
 const CERTIFICATE_DB = [
   // ── Docking & ADMET Training Workshop — 48 participants ──────────────────
   // Replace each YOUR_FILE_ID_HERE with the actual Google Drive file ID for that student's certificate.
-  { name: "Muhammad Hamza",           driveLink: "https://drive.google.com/uc?export=download&id=" },
+  { name: "Muhammad Hamza",           driveLink: "https://drive.google.com/uc?export=download&id=16mubiyh1Vxv9tGSD9fg105F36pdKINlj" },
   { name: "Muhammad Qasim",           driveLink: "https://drive.google.com/uc?export=download&id=1HUwThL_7HgIAo2GkkPhQu3mm6jBXVmMM" },
   { name: "Muhammad Talha Ijaz",      driveLink: "https://drive.google.com/uc?export=download&id=1I8p7kEs9nSSHJpiNnLitOLLQSJc-0umj" },
   { name: "Maryam Shafi",             driveLink: "https://drive.google.com/uc?export=download&id=1ag_DulZ2beBzSHGfQ1Rs5MFTiIZFgE4p" },
