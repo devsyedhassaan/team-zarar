@@ -3,10 +3,74 @@ import { useState, useEffect, useRef } from "react";
 // ─── CONFIG ────────────────────────────────────────────────────────────────
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhUKSlmTpRW9nGmUaFvHw4uYKerOChCKl6Cmvpvbkv82MRoPJsFuG9E-shqllfmjM/exec";
 
+// ─── CERTIFICATE DATABASE ─────────────────────────────────────────────────────
+// Add your students here.
+// Each entry: { name: "Exact Name As On Certificate", driveLink: "https://drive.google.com/..." }
+// The driveLink should be a direct download or viewable link to the PDF/image in your Google Drive.
+//
+// HOW TO GET A DIRECT DOWNLOAD LINK FROM GOOGLE DRIVE:
+//   1. Upload the certificate image/PDF to Google Drive
+//   2. Right-click → "Get link" → Set to "Anyone with the link"
+//   3. Copy the link (looks like: https://drive.google.com/file/d/FILE_ID/view?usp=sharing)
+//   4. Change it to: https://drive.google.com/uc?export=download&id=FILE_ID
+//   Example: https://drive.google.com/uc?export=download&id=1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms
+//
+// Add one entry per student below:
+
+const CERTIFICATE_DB = [
+  // ── Docking & ADMET Training Workshop — 48 participants ──────────────────
+  // Replace each YOUR_FILE_ID_HERE with the actual Google Drive file ID for that student's certificate.
+  { name: "Muhammad Hamza",           driveLink: "https://drive.google.com/uc?export=download&id=" },
+  { name: "Muhammad Qasim",           driveLink: "https://drive.google.com/uc?export=download&id=1HUwThL_7HgIAo2GkkPhQu3mm6jBXVmMM" },
+  { name: "Muhammad Talha Ijaz",      driveLink: "https://drive.google.com/uc?export=download&id=1I8p7kEs9nSSHJpiNnLitOLLQSJc-0umj" },
+  { name: "Maryam Shafi",             driveLink: "https://drive.google.com/uc?export=download&id=1ag_DulZ2beBzSHGfQ1Rs5MFTiIZFgE4p" },
+  { name: "Mashaim Noor",             driveLink: "https://drive.google.com/uc?export=download&id=1KYov3PoHaKTe6huRC807_-1_alGRqdJX" },
+  { name: "Muhammad Ubaid U Allah",   driveLink: "https://drive.google.com/uc?export=download&id=1LGXthTJECZc_xdQHO7prL4xe-ssInMDM" },
+  { name: "Mahtab Noor",              driveLink: "https://drive.google.com/uc?export=download&id=1d-zfzakRHxbwRd0C8WDLgjts6evI0X63" },
+  { name: "Rida Fatima",              driveLink: "https://drive.google.com/uc?export=download&id=1rdvAUMYX_pyLeFklDxhrHHqo0hR0uzYa" },
+  { name: "Ayesha Saeed",             driveLink: "https://drive.google.com/uc?export=download&id=1d2E-3Y4KjdYoUtbxCuj8oCOSdEvvMB1y" },
+  { name: "Mahnoor",                  driveLink: "https://drive.google.com/uc?export=download&id=15Y14JeIAp9Dq5gTAqpWKNHhFn8uwLJgr" },
+  { name: "Shagufta Faryal",          driveLink: "https://drive.google.com/uc?export=download&id=1dOSTkB_ZtKrSjhVkpPhId5Za_M15k0s3" },
+  { name: "Noor Fatima",              driveLink: "https://drive.google.com/uc?export=download&id=12FC7-DwIegdUPZQ2lnOeZwhUYvPVL8_o" },
+  { name: "Huma Munir Ahmad",         driveLink: "https://drive.google.com/uc?export=download&id=1poCToYABTI3e2LtkWAtW22zJjyGGuvFt" },
+  { name: "Aleeza Sajid",             driveLink: "https://drive.google.com/uc?export=download&id=1oLER6v-ndqtwM_oyypgss2EA0zj4W6ev" },
+  { name: "Ayesha Ahmad",             driveLink: "https://drive.google.com/uc?export=download&id=15ia7hMsjIplm0Mx0uYaTaLapoZKfY28A" },
+  { name: "Saman Sohail",             driveLink: "https://drive.google.com/uc?export=download&id=1GRX062U3RirJkYa21rBKbm5q0fgo3Hkn" },
+  { name: "Esha Minhal Imran",        driveLink: "https://drive.google.com/uc?export=download&id=1e4MPWFF3EA2nS4VbDru92CTEhvhhhiql" },
+  { name: "Amal Izhar Khan",          driveLink: "https://drive.google.com/uc?export=download&id=15YvDxS7C3NQuGJed8keLT0c1Pkc388Zs" },
+  { name: "Abdul Ahad Majid",         driveLink: "https://drive.google.com/uc?export=download&id=1dB3VvZLrq6pIbmKVRmxiprd5Dqy-SBUh" },
+  { name: "Tayyab Hussain",           driveLink: "https://drive.google.com/uc?export=download&id=1x3G5MHUklnVYNLK2MWJf5T8TlVH84Lb-" },
+  { name: "Dua E Hoor",               driveLink: "https://drive.google.com/uc?export=download&id=1NbHKz9079Yr24H5Gl3UdQzvfyoB_oZRh" },
+  { name: "Muhammad Ahmer",           driveLink: "https://drive.google.com/uc?export=download&id=1Wfzo-XVVT6o1qdokz1K4QE5FEgabMmFh" },
+  { name: "Areeba Iqbal",             driveLink: "https://drive.google.com/uc?export=download&id=1PAJOEO4IPGl0owtoUyp2uQAHpd8KG5Kf" },
+  { name: "Khadija Bibi",             driveLink: "https://drive.google.com/uc?export=download&id=1_lF_-cZu8ewQzb4YusUDwUw3CYRdePm7" },
+  { name: "Hadia Nawaz",              driveLink: "https://drive.google.com/uc?export=download&id=1oniwkqfH-2Ji0HBRJxNfOHypdirJDChs" },
+  { name: "Muhammad Usman Tahir",     driveLink: "https://drive.google.com/uc?export=download&id=1wT_37jFYg31Ih2FES5teLo_AECklmHOo" },
+  { name: "Muhammad Husnain Younas",  driveLink: "https://drive.google.com/uc?export=download&id=1lkduT7SyjYalQUFNc7BwcTwDeokXSOZn" },
+  { name: "Fatima Ayyaz",             driveLink: "https://drive.google.com/uc?export=download&id=1hy-LrvBGJxNOtdu6hMr2UhMIIffpJHbm" },
+  { name: "Rehma Safdar",             driveLink: "https://drive.google.com/uc?export=download&id=1oBVn3ji4PeFdxdA1BIkHwI9ofwn_cRT1" },
+  { name: "Atika Saifullah",          driveLink: "https://drive.google.com/uc?export=download&id=1fjXE9SRmvCoaI0mIDaVLipgruz8eSu1c" },
+  { name: "Asad Ali",                 driveLink: "https://drive.google.com/uc?export=download&id=1hGXnLzQ6EalWzBBq_JMSYxfXQBKUULlf" },
+  { name: "Iman Fatima",              driveLink: "https://drive.google.com/uc?export=download&id=1xPak3Zb9xItNSJzKyjuHMvsGZiocuEWG" },
+  { name: "Manahil",                  driveLink: "https://drive.google.com/uc?export=download&id=1o5GfsZ0UFxAYLBGs82He-mbyLMt3TSuz" },
+  { name: "Madiha Fatima",            driveLink: "https://drive.google.com/uc?export=download&id=1dpjvPcoFLuuFUfyy0QDmM-1-_B-HRAx8" },
+  { name: "Alishba Sajjad",           driveLink: "https://drive.google.com/uc?export=download&id=1a4sESVqu4NQJJRrLAU2sYOdvDeN-UKLY" },
+  { name: "Zoha",                     driveLink: "https://drive.google.com/uc?export=download&id=17z_J1LsvAqPN6Sbe4XVwLRUAme7upIFK" },
+  { name: "Uswa",                     driveLink: "https://drive.google.com/uc?export=download&id=1paBPmsGn6BXS8GP4MheSVJd_Mvy5Dbap" },
+  { name: "Ali Mujtaba",              driveLink: "https://drive.google.com/uc?export=download&id=1hT87pH9kX1-EwFrtlx3Fe3wn_vHxRRpj" },
+  { name: "Nimra Wasif",              driveLink: "https://drive.google.com/uc?export=download&id=1Va0U0RbzLp3zaEea4JQ44oSBSwoELipd" },
+  { name: "Rana Saqlain Mehmood",     driveLink: "https://drive.google.com/uc?export=download&id=1T3Ip5sYua5QZEhgUfMGPDghNsxrXv92h" },
+  { name: "Hafiz Shahbaz Majeed",     driveLink: "https://drive.google.com/uc?export=download&id=1gjSA618Pf81UUT4KCM83HvxQveIFwtOY" },
+  { name: "Rana Abdul Kalam",         driveLink: "https://drive.google.com/uc?export=download&id=1m4IFniQqzBd49KdwuOE6XKtUNdsaul-Y" },
+  { name: "Syed Muhammad Hassaan",    driveLink: "https://drive.google.com/uc?export=download&id=1GTYNc74GYQO_FL2hXgfHoUQhGeBDlkVn" },
+  { name: "Marsad Zaman Khan",        driveLink: "https://drive.google.com/uc?export=download&id=1qV5HePyD3_DUxAufHOxzQE2DK4oGGy5d" },
+  { name: "Asil Mehmood",             driveLink: "https://drive.google.com/uc?export=download&id=1gozcmtbsyTgD1ax0qORqc9Q61nE3gx_P" },
+  { name: "Usama Iqbal",              driveLink: "https://drive.google.com/uc?export=download&id=1IJp_qaZv0p5EdtMlZZEk4-jFSK-3o-YM" },
+  { name: "Rehan Jamil",              driveLink: "https://drive.google.com/uc?export=download&id=1aq0Hp90po2kKqD76C1OabX5tI7ZWwjt_" },
+  { name: "Shah Nawaz",               driveLink: "https://drive.google.com/uc?export=download&id=1V1ieGWf9Nk-dC7msgXLJKmKWpYBdaLwO" },
+];
+
 // ─── EVENTS DATA ─────────────────────────────────────────────────────────────
-// registrationStatus: "open" | "closed"
-// Set to "closed" to disable registration buttons and hide the registration form.
-// closeAt: ISO 8601 datetime string — registration auto-closes at this moment (optional).
 const EVENTS = [
   {
     id: 1,
@@ -28,7 +92,8 @@ const EVENTS = [
     sheetId: "1aR4gZBAlNRDvKUdkr0aGrRIIihZVbMuhMpAXAgMrA9g",
     folderId: "1VRokvaSru9BKFABugsvnkGi2RCW3PhNh",
     registrationStatus: "closed",
-    closeAt: "2026-04-24T15:00:00+05:00", // Auto-close at 3:00 PM PKT (GMT+5) on April 24, 2026
+    closeAt: "2026-04-24T15:00:00+05:00",
+    hasCertificates: true, // ← This enables the certificate button for this event
   },
   {
     id: 2,
@@ -91,10 +156,6 @@ function isPast(dateStr) {
   return eventDate < today;
 }
 
-// Returns true if registration should be blocked:
-// - event is past, OR
-// - registrationStatus is manually "closed", OR
-// - closeAt datetime has been reached
 function isRegistrationClosed(ev) {
   if (isPast(ev.date)) return true;
   if (ev.registrationStatus === "closed") return true;
@@ -103,6 +164,19 @@ function isRegistrationClosed(ev) {
     if (new Date() >= closeTime) return true;
   }
   return false;
+}
+
+// ─── CERTIFICATE SEARCH HELPER ────────────────────────────────────────────────
+// Normalizes a string for fuzzy matching: lowercase, trim, collapse spaces
+function normalize(str) {
+  return str.toLowerCase().trim().replace(/\s+/g, " ");
+}
+
+// Returns matching certificates (partial name match, case-insensitive)
+function searchCertificates(query) {
+  if (!query.trim()) return [];
+  const q = normalize(query);
+  return CERTIFICATE_DB.filter(entry => normalize(entry.name).includes(q));
 }
 
 // ─── HISTORY HELPERS ─────────────────────────────────────────────────────────
@@ -160,6 +234,30 @@ const Icon = {
   Flag: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="13" height="13">
       <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
+    </svg>
+  ),
+  Certificate: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+      <circle cx="12" cy="8" r="6" />
+      <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+    </svg>
+  ),
+  Search: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  ),
+  Download: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  ),
+  Award: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="40" height="40">
+      <circle cx="12" cy="8" r="6" />
+      <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
     </svg>
   ),
 };
@@ -252,7 +350,6 @@ const S = {
     border: "none", borderRadius: 8, padding: "7px 16px", cursor: "pointer",
     letterSpacing: "0.3px", display: "flex", alignItems: "center", gap: 6,
   }),
-  // Badge shown on card when event is past (Event Ended)
   eventEndedBadge: {
     fontSize: 11, fontWeight: 700, color: "#FF4D6D",
     background: "linear-gradient(135deg, rgba(255,77,109,0.18), rgba(180,30,60,0.12))",
@@ -262,7 +359,6 @@ const S = {
     boxShadow: "0 0 8px rgba(255,77,109,0.15)",
     letterSpacing: "0.2px",
   },
-  // Badge shown on card when registration is manually closed (but event not past)
   regClosedBadge: {
     fontSize: 11, fontWeight: 700, color: "#FF8C42",
     background: "rgba(255,140,66,0.12)", border: "1px solid rgba(255,140,66,0.3)",
@@ -298,7 +394,6 @@ const S = {
   metaBox: { background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 12px" },
   metaBoxLabel: { fontSize: 10, color: "#666", letterSpacing: "0.5px", textTransform: "uppercase", marginBottom: 3 },
   metaBoxValue: { fontSize: 13, fontWeight: 600, color: "#fff" },
-  // Registration status pill shown on the detail hero card
   regStatusPill: (closed) => ({
     display: "inline-flex", alignItems: "center", gap: 6,
     fontSize: 12, fontWeight: 700,
@@ -322,7 +417,6 @@ const S = {
     cursor: "pointer", letterSpacing: "0.2px",
     display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
   }),
-  // Shown in detail view when registration is manually closed
   regClosedBox: {
     textAlign: "center", padding: "18px 16px",
     background: "rgba(255,140,66,0.07)",
@@ -330,6 +424,16 @@ const S = {
     borderRadius: 14, fontSize: 14,
     color: "#FF8C42", fontWeight: 600,
     display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+  },
+  // Certificate button on detail page
+  certBtn: {
+    width: "100%", padding: "16px",
+    background: "linear-gradient(135deg, #22C97A20, #22C97A10)",
+    border: "1.5px solid #22C97A50",
+    color: "#22C97A", fontWeight: 800, fontSize: 15, borderRadius: 14,
+    cursor: "pointer", marginTop: 12,
+    display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+    letterSpacing: "0.2px", transition: "all 0.2s ease",
   },
   formHeader: { marginBottom: 24 },
   formTitle: { fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 6 },
@@ -479,6 +583,183 @@ function Field({ id, label, required, type = "text", placeholder, value, onChang
   );
 }
 
+// ─── CERTIFICATE PAGE ─────────────────────────────────────────────────────────
+function CertificatePage({ event, onBack }) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [searched, setSearched] = useState(false);
+
+  function handleSearch() {
+    if (!query.trim()) return;
+    setResults(searchCertificates(query));
+    setSearched(true);
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === "Enter") handleSearch();
+  }
+
+  return (
+    <div style={S.app}>
+      <div style={S.header}>
+        <div style={S.logo}>Team<span style={S.logoAccent}> Zarar</span></div>
+      </div>
+      <div style={S.page}>
+        <button style={S.backBtn} onClick={onBack}><Icon.Back /> Back to Event</button>
+
+        {/* ── Hero banner ── */}
+        <div style={{
+          background: "linear-gradient(135deg, rgba(34,201,122,0.15), rgba(79,124,255,0.10))",
+          border: "1px solid rgba(34,201,122,0.25)",
+          borderRadius: 20, padding: "28px 24px", marginBottom: 28, textAlign: "center",
+        }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: "50%",
+            background: "rgba(34,201,122,0.15)", border: "2px solid #22C97A",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#22C97A", margin: "0 auto 16px",
+          }}>
+            <Icon.Award />
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 6 }}>
+            Download Your Certificate
+          </div>
+          <div style={{ fontSize: 13, color: "#AAB0C0", lineHeight: 1.6 }}>
+            {event.title}
+          </div>
+          <div style={{
+            display: "inline-block", marginTop: 10,
+            fontSize: 11, fontWeight: 600, color: "#22C97A",
+            background: "rgba(34,201,122,0.1)", border: "1px solid rgba(34,201,122,0.3)",
+            borderRadius: 20, padding: "3px 12px",
+          }}>
+            {CERTIFICATE_DB.length} certificates issued
+          </div>
+        </div>
+
+        {/* ── Search box ── */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={S.label}>Search by Your Full Name</div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 1, position: "relative" }}>
+              <input
+                type="text"
+                placeholder="e.g. Muhammad Ali"
+                value={query}
+                onChange={e => { setQuery(e.target.value); setSearched(false); }}
+                onKeyDown={handleKeyDown}
+                style={{
+                  ...S.input,
+                  paddingLeft: 42,
+                }}
+                onFocus={e => e.target.style.borderColor = "#22C97A"}
+                onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
+              />
+              <div style={{
+                position: "absolute", left: 13, top: "50%",
+                transform: "translateY(-50%)", color: "#555",
+                pointerEvents: "none",
+              }}>
+                <Icon.Search />
+              </div>
+            </div>
+            <button
+              onClick={handleSearch}
+              style={{
+                background: "#22C97A", color: "#0B0E1A",
+                border: "none", borderRadius: 10,
+                padding: "0 18px", fontWeight: 800, fontSize: 14,
+                cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap",
+              }}
+            >
+              Search
+            </button>
+          </div>
+          <div style={{ fontSize: 11, color: "#555", marginTop: 6 }}>
+            Try typing your first name or last name. Search is case-insensitive.
+          </div>
+        </div>
+
+        {/* ── Results ── */}
+        {searched && results.length === 0 && (
+          <div style={{
+            textAlign: "center", padding: "32px 20px",
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: 14,
+          }}>
+            <div style={{ fontSize: 32, marginBottom: 10 }}>🔍</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 6 }}>No certificate found</div>
+            <div style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>
+              Make sure you type your name exactly as you registered.<br />
+              Try using a different part of your name.
+            </div>
+          </div>
+        )}
+
+        {results.length > 0 && (
+          <div>
+            <div style={{ fontSize: 12, color: "#555", marginBottom: 10 }}>
+              {results.length} result{results.length !== 1 ? "s" : ""} found
+            </div>
+            {results.map((entry, i) => (
+              <div key={i} style={{
+                background: "rgba(34,201,122,0.05)",
+                border: "1px solid rgba(34,201,122,0.2)",
+                borderRadius: 14, padding: "18px 20px", marginBottom: 12,
+                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: "50%",
+                    background: "rgba(34,201,122,0.15)", border: "1.5px solid #22C97A",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#22C97A", fontSize: 18, flexShrink: 0,
+                  }}>
+                    🎓
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{entry.name}</div>
+                    <div style={{ fontSize: 11, color: "#22C97A", marginTop: 2 }}>Certificate ready</div>
+                  </div>
+                </div>
+                <a
+                  href={entry.driveLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    background: "#22C97A", color: "#0B0E1A",
+                    fontWeight: 800, fontSize: 12,
+                    border: "none", borderRadius: 8,
+                    padding: "10px 14px", cursor: "pointer",
+                    textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap",
+                  }}
+                >
+                  <Icon.Download /> Download
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── Help note ── */}
+        <div style={{
+          marginTop: 28, padding: "14px 16px",
+          background: "rgba(79,124,255,0.06)",
+          border: "1px solid rgba(79,124,255,0.15)",
+          borderRadius: 12,
+        }}>
+          <div style={{ fontSize: 12, color: "#AAB0C0", lineHeight: 1.7 }}>
+            <strong style={{ color: "#4F7CFF" }}>Note:</strong> Certificates are being issued to all participants who successfully completed the workshop. If your name doesn't appear, please contact Team Zarar.
+          </div>
+        </div>
+      </div>
+      <DevBar />
+    </div>
+  );
+}
+
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [screen, setScreen] = useState("home");
@@ -488,7 +769,6 @@ export default function App() {
   );
   const [countsLoaded, setCountsLoaded] = useState(false);
 
-  // ── Fetch seat counts ───────────────────────────────────────────────────
   useEffect(() => {
     async function fetchCounts() {
       const results = await Promise.all(
@@ -508,12 +788,10 @@ export default function App() {
     fetchCounts();
   }, []);
 
-  // ── Seed initial history entry so popstate fires on first back press ────
   useEffect(() => {
     window.history.replaceState({ screen: "home", eventId: null }, "");
   }, []);
 
-  // ── Handle browser / Android hardware back button ───────────────────────
   useEffect(() => {
     function handlePopState(e) {
       const state = e.state;
@@ -530,12 +808,13 @@ export default function App() {
         setScreen("detail");
       } else if (targetScreen === "form") {
         setScreen("form");
+      } else if (targetScreen === "certificates") {
+        setScreen("certificates");
       } else {
         setScreen("home");
         setSelectedEvent(null);
       }
     }
-
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
@@ -549,12 +828,10 @@ export default function App() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  // ── Scroll to top on every screen change ───────────────────────────────
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [screen]);
 
-  // ── Navigation helpers ──────────────────────────────────────────────────
   function openEvent(ev) {
     setSelectedEvent(ev);
     pushScreen("detail", ev.id);
@@ -568,6 +845,11 @@ export default function App() {
     setScreen("form");
   }
 
+  function openCertificates() {
+    pushScreen("certificates", selectedEvent?.id ?? null);
+    setScreen("certificates");
+  }
+
   function goBackToHome() {
     window.history.back();
   }
@@ -576,7 +858,6 @@ export default function App() {
     window.history.back();
   }
 
-  // ── Validation ──────────────────────────────────────────────────────────
   function validate() {
     const e = {};
     if (!form.fullName.trim()) e.fullName = "Full name is required";
@@ -590,9 +871,7 @@ export default function App() {
   }
 
   async function handleSubmit() {
-    // Guard: block submission if registration is closed
     if (selectedEvent && isRegistrationClosed(selectedEvent)) return;
-
     const e = validate();
     if (Object.keys(e).length) { setErrors(e); return; }
     setSubmitting(true);
@@ -634,6 +913,11 @@ export default function App() {
     setErrors(er => ({ ...er, screenshot: undefined }));
   }
 
+  // ── CERTIFICATE SCREEN ────────────────────────────────────────────────────
+  if (screen === "certificates" && selectedEvent) {
+    return <CertificatePage event={selectedEvent} onBack={goBackToDetail} />;
+  }
+
   // ── HOME ──────────────────────────────────────────────────────────────────
   if (screen === "home") {
     const upcomingEvents = EVENTS.filter(ev => !isPast(ev.date));
@@ -672,8 +956,6 @@ export default function App() {
             <div style={S.progressBar}><div style={S.progressFill(pct, ev.color)} /></div>
             <div style={S.feeRow}>
               <div style={S.feeBadge(ev.fee === 0)}>{ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}</div>
-
-              {/* ── Registration status badges ── */}
               {past && (
                 <span style={S.eventEndedBadge}>
                   <Icon.Flag /> Event Ended
@@ -688,6 +970,32 @@ export default function App() {
                 <button style={S.registerBtn(ev.color)}>Register <Icon.Arrow /></button>
               )}
             </div>
+
+            {/* ── Certificate button shown directly on card ── */}
+            {ev.hasCertificates && (
+              <button
+                onClick={e => {
+                  e.stopPropagation(); // prevent opening event detail
+                  setSelectedEvent(ev);
+                  pushScreen("certificates", ev.id);
+                  setScreen("certificates");
+                }}
+                style={{
+                  marginTop: 12, width: "100%",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+                  padding: "10px 0",
+                  background: "rgba(34,201,122,0.08)",
+                  border: "1px solid rgba(34,201,122,0.3)",
+                  borderRadius: 10, cursor: "pointer",
+                  fontSize: 12, fontWeight: 700, color: "#22C97A",
+                  letterSpacing: "0.2px", transition: "all 0.18s ease",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(34,201,122,0.18)"; e.currentTarget.style.borderColor = "rgba(34,201,122,0.55)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "rgba(34,201,122,0.08)"; e.currentTarget.style.borderColor = "rgba(34,201,122,0.3)"; }}
+              >
+                <Icon.Certificate /> Download e-Certificate
+              </button>
+            )}
           </div>
         </div>
       );
@@ -753,19 +1061,16 @@ export default function App() {
               <div style={S.metaBox}><div style={S.metaBoxLabel}>Duration</div><div style={S.metaBoxValue}>{ev.duration}</div></div>
               <div style={S.metaBox}><div style={S.metaBoxLabel}>Fee</div><div style={S.metaBoxValue}>{ev.fee === 0 ? "FREE" : `PKR ${ev.fee}`}</div></div>
             </div>
-
-            {/* ── Registration status pill ── */}
             <div style={S.regStatusPill(regClosed)}>
               <div style={S.regStatusDot(regClosed)} />
               Registration: {regClosed ? "Closed" : "Open"}
             </div>
-
             <div style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>{pct}% seats filled ({filled}/{ev.seats})</div>
             <div style={S.progressBar}><div style={S.progressFill(pct, ev.color)} /></div>
           </div>
           <div style={S.descBox}>{ev.description}</div>
 
-          {/* ── CTA area based on status ── */}
+          {/* ── CTA area ── */}
           {!isPast(ev.date) && !regClosed && (
             <button style={S.bigRegBtn(ev.color)} onClick={openForm}>
               Register for this Event <Icon.Arrow />
@@ -789,6 +1094,24 @@ export default function App() {
               <Icon.Lock /> Registration for this event has ended
             </div>
           )}
+
+          {/* ── Certificate download button — only for events with hasCertificates: true ── */}
+          {ev.hasCertificates && (
+            <button
+              style={S.certBtn}
+              onClick={openCertificates}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = "rgba(34,201,122,0.2)";
+                e.currentTarget.style.borderColor = "rgba(34,201,122,0.6)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = "linear-gradient(135deg, rgba(34,201,122,0.15), rgba(34,201,122,0.10))";
+                e.currentTarget.style.borderColor = "rgba(34,201,122,0.5)";
+              }}
+            >
+              <Icon.Certificate /> Download Your e-Certificate
+            </button>
+          )}
         </div>
         <DevBar />
       </div>
@@ -796,7 +1119,6 @@ export default function App() {
   }
 
   // ── FORM ──────────────────────────────────────────────────────────────────
-  // Safety guard: if somehow a user reaches the form with registration closed, block them
   if (screen === "form" && selectedEvent) {
     const ev = selectedEvent;
 
@@ -858,9 +1180,7 @@ export default function App() {
             <div style={{
               background: "rgba(79,124,255,0.08)",
               border: "1px solid rgba(79,124,255,0.25)",
-              borderRadius: 12,
-              padding: "16px 18px",
-              marginBottom: 18,
+              borderRadius: 12, padding: "16px 18px", marginBottom: 18,
             }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 12 }}>
                 Make a payment of Rs. {ev.fee} to the following account
